@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="SmartFarm Advisor helps farmers make smarter decisions using crop intelligence, weather, soil and farm advisory tools."
+    >
+
+    <title>SmartFarm Advisor | Smart Decisions. Better Farming.</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <a
+        href="{{ url_for('home') }}"
+        class="brand"
+        aria-label="SmartFarm Advisor Home"
+    >
+
+        <img
+            src="{{ url_for('static', filename='images/logo.png') }}"
+            alt="SmartFarm Advisor logo"
+        >
+
+        <div>
+            <h2>SmartFarm</h2>
+            <span>Advisor</span>
+        </div>
+
+    </a>
+
+
+    <nav aria-label="Main navigation">
+
+        <a
+            href="{{ url_for('home') }}"
+            class="active"
+        >
+            Home
+        </a>
+
+        <a href="{{ url_for('advisor') }}">
+            Crop Advisor
+        </a>
+
+        <a href="{{ url_for('history') }}">
+            History
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main>
+
+    <!-- ==================================================
+         HERO
+    =================================================== -->
+
+    <section class="home-hero">
+
+        <div class="home-hero-content">
+
+            <span class="home-badge">
+                SMART AGRICULTURE • AI-ASSISTED DECISIONS
+            </span>
+
+            <h1>
+                Smart decisions.<br>
+                <span>Better farming.</span>
+            </h1>
+
+            <p>
+                SmartFarm Advisor helps you understand your farm,
+                choose suitable crops and make better agricultural
+                decisions using soil, weather and environmental data.
+            </p>
+
+
+            <div class="home-hero-actions">
+
+                <a
+                    href="{{ url_for('advisor') }}"
+                    class="primary-button home-primary-button"
+                >
+                    Get Started
+                    <span aria-hidden="true">→</span>
+                </a>
+
+                <a
+                    href="#features"
+                    class="secondary-button home-secondary-button"
+                >
+                    Explore Features
+                </a>
+
+            </div>
+
+
+            <div class="home-trust">
+
+                <div>
+                    <strong>🌱</strong>
+                    <span>Farm-focused</span>
+                </div>
+
+                <div>
+                    <strong>🧠</strong>
+                    <span>AI-assisted</span>
+                </div>
+
+                <div>
+                    <strong>📊</strong>
+                    <span>Data-driven</span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- HERO VISUAL -->
+
+        <div class="home-hero-visual">
+
+            <div class="farm-visual-card">
+
+                <div class="farm-visual-top">
+
+                    <span class="visual-label">
+                        SMARTFARM
+                    </span>
+
+                    <span class="visual-status">
+                        ● ACTIVE
+                    </span>
+
+                </div>
+
+
+                <div class="farm-visual-main">
+
+                    <div class="sun-icon">
+                        ☀
+                    </div>
+
+                    <div>
+
+                        <span class="visual-small">
+                            FARM INTELLIGENCE
+                        </span>
+
+                        <h3>
+                            Grow with<br>
+                            better decisions.
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div class="farm-fields">
+
+                    <div class="field field-one"></div>
+                    <div class="field field-two"></div>
+                    <div class="field field-three"></div>
+
+                </div>
+
+
+                <div class="farm-visual-footer">
+
+                    <div>
+                        <span>SOIL</span>
+                        <strong>INSIGHT</strong>
+                    </div>
+
+                    <div>
+                        <span>CROP</span>
+                        <strong>ADVISORY</strong>
+                    </div>
+
+                    <div>
+                        <span>WEATHER</span>
+                        <strong>INTELLIGENCE</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==================================================
+         INTRO
+    =================================================== -->
+
+    <section class="home-intro">
+
+        <span class="section-label">
+            BUILT AROUND THE FARM
+        </span>
+
+        <h2>
+            One place for smarter<br>
+            farming decisions.
+        </h2>
+
+        <p>
+            Farming decisions depend on many things at once.
+            SmartFarm Advisor is being built to bring those
+            pieces together — from soil and weather to crop
+            selection, irrigation, crop health and eventually harvest.
+        </p>
+
+    </section>
+
+
+    <!-- ==================================================
+         FEATURES
+    =================================================== -->
+
+    <section
+        class="home-features"
+        id="features"
+    >
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-label">
+                    SMART FARMING TOOLS
+                </span>
+
+                <h2>
+                    Start with the information<br>
+                    that matters.
+                </h2>
+
+            </div>
+
+            <p>
+                More capabilities will be added step by step
+                as SmartFarm Advisor grows.
+            </p>
+
+        </div>
+
+
+        <div class="home-feature-grid">
+
+
+            <!-- FEATURE 1 -->
+
+            <article class="home-feature-card">
+
+                <div class="home-feature-icon">
+                    📍
+                </div>
+
+                <span class="feature-number">
+                    01
+                </span>
+
+                <h3>
+                    My Farm
+                </h3>
+
+                <p>
+                    Build a digital profile of your farm,
+                    location and growing conditions.
+                </p>
+
+                <span class="feature-status">
+                    COMING NEXT
+                </span>
+
+            </article>
+
+
+            <!-- FEATURE 2 -->
+
+            <article class="home-feature-card">
+
+                <div class="home-feature-icon">
+                    🌦️
+                </div>
+
+                <span class="feature-number">
+                    02
+                </span>
+
+                <h3>
+                    Weather Intelligence
+                </h3>
+
+                <p>
+                    Understand weather conditions that can
+                    influence field operations and crops.
+                </p>
+
+                <span class="feature-status">
+                    COMING NEXT
+                </span>
+
+            </article>
+
+
+            <!-- FEATURE 3 -->
+
+            <article
+                class="home-feature-card feature-highlight"
+            >
+
+                <div class="home-feature-icon">
+                    🌱
+                </div>
+
+                <span class="feature-number">
+                    03
+                </span>
+
+                <h3>
+                    Crop Advisor
+                </h3>
+
+                <p>
+                    Analyze soil and environmental conditions
+                    to identify suitable crops.
+                </p>
+
+                <span class="feature-status available">
+                    AVAILABLE NOW
+                </span>
+
+            </article>
+
+
+            <!-- FEATURE 4 -->
+
+            <article class="home-feature-card">
+
+                <div class="home-feature-icon">
+                    🧪
+                </div>
+
+                <span class="feature-number">
+                    04
+                </span>
+
+                <h3>
+                    Soil Intelligence
+                </h3>
+
+                <p>
+                    Use soil information to understand the
+                    conditions affecting crop selection.
+                </p>
+
+                <span class="feature-status">
+                    COMING NEXT
+                </span>
+
+            </article>
+
+
+            <!-- FEATURE 5 -->
+
+            <article class="home-feature-card">
+
+                <div class="home-feature-icon">
+                    💧
+                </div>
+
+                <span class="feature-number">
+                    05
+                </span>
+
+                <h3>
+                    Irrigation Advisor
+                </h3>
+
+                <p>
+                    Combine crop, soil and weather information
+                    to support irrigation decisions.
+                </p>
+
+                <span class="feature-status">
+                    COMING NEXT
+                </span>
+
+            </article>
+
+
+            <!-- FEATURE 6 -->
+
+            <article class="home-feature-card">
+
+                <div class="home-feature-icon">
+                    🩺
+                </div>
+
+                <span class="feature-number">
+                    06
+                </span>
+
+                <h3>
+                    Crop Health
+                </h3>
+
+                <p>
+                    Track crop risks and health as the
+                    SmartFarm system expands.
+                </p>
+
+                <span class="feature-status">
+                    COMING NEXT
+                </span>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==================================================
+         HOW IT WORKS
+    =================================================== -->
+
+    <section class="home-process">
+
+        <div class="section-heading center">
+
+            <span class="section-label">
+                HOW SMARTFARM WORKS
+            </span>
+
+            <h2>
+                From farm information<br>
+                to better action.
+            </h2>
+
+        </div>
+
+
+        <div class="home-process-grid">
+
+
+            <div class="home-process-step">
+
+                <span class="process-number">
+                    01
+                </span>
+
+                <div class="process-line"></div>
+
+                <h3>
+                    Understand
+                </h3>
+
+                <p>
+                    Start with your farm, soil, location
+                    and environmental conditions.
+                </p>
+
+            </div>
+
+
+            <div class="home-process-step">
+
+                <span class="process-number">
+                    02
+                </span>
+
+                <div class="process-line"></div>
+
+                <h3>
+                    Analyze
+                </h3>
+
+                <p>
+                    SmartFarm evaluates available data
+                    using agricultural decision tools.
+                </p>
+
+            </div>
+
+
+            <div class="home-process-step">
+
+                <span class="process-number">
+                    03
+                </span>
+
+                <div class="process-line"></div>
+
+                <h3>
+                    Decide
+                </h3>
+
+                <p>
+                    Turn information into practical
+                    farming decisions.
+                </p>
+
+            </div>
+
+
+            <div class="home-process-step">
+
+                <span class="process-number">
+                    04
+                </span>
+
+                <div class="process-line"></div>
+
+                <h3>
+                    Improve
+                </h3>
+
+                <p>
+                    Build a continuous picture of your
+                    farm throughout the crop cycle.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==================================================
+         CTA
+    =================================================== -->
+
+    <section class="home-cta">
+
+        <div>
+
+            <span class="section-label">
+                START YOUR FARM ANALYSIS
+            </span>
+
+            <h2>
+                Ready to make a<br>
+                smarter decision?
+            </h2>
+
+            <p>
+                Begin with the crop advisor and provide
+                the conditions you already know about your farm.
+            </p>
+
+        </div>
+
+
+        <a
+            href="{{ url_for('advisor') }}"
+            class="primary-button home-cta-button"
+        >
+            Open Crop Advisor
+            <span aria-hidden="true">→</span>
+        </a>
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    <p>
+        SmartFarm Advisor · AI-assisted agricultural
+        decision support
+    </p>
+
+</footer>
+
+
+</body>
+
+</html>
