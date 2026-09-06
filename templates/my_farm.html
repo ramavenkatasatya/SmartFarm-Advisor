@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Manage your SmartFarm Advisor farm profile."
+    >
+
+    <title>SmartFarm Advisor | My Farm</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<header class="navbar">
+
+    <a
+        href="{{ url_for('home') }}"
+        class="brand"
+    >
+
+        <img
+            src="{{ url_for('static', filename='images/logo.png') }}"
+            alt="SmartFarm Advisor"
+        >
+
+        <div>
+
+            <h2>SmartFarm</h2>
+
+            <span>Advisor</span>
+
+        </div>
+
+    </a>
+
+
+    <nav aria-label="Main navigation">
+
+        <a href="{{ url_for('home') }}">
+            Home
+        </a>
+
+        <a href="{{ url_for('dashboard') }}">
+            Dashboard
+        </a>
+
+        <a
+            href="{{ url_for('my_farm') }}"
+            class="active"
+        >
+            My Farm
+        </a>
+
+        <a href="{{ url_for('advisor') }}">
+            Crop Advisor
+        </a>
+
+        <a href="{{ url_for('history') }}">
+            History
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="farm-profile-container">
+
+
+    <!-- ==============================================
+         PAGE HEADER
+    =============================================== -->
+
+    <section class="farm-profile-header">
+
+        <div>
+
+            <span class="section-label">
+                FARM PROFILE
+            </span>
+
+            <h1>
+                My Farm
+            </h1>
+
+            <p>
+                Tell SmartFarm about your farm so future
+                advisory tools can make recommendations
+                using your actual farm conditions.
+            </p>
+
+        </div>
+
+
+        <div class="farm-profile-badge">
+
+            <span>
+                FARM PROFILE
+            </span>
+
+            <strong>
+                {% if profile %}
+                    SAVED
+                {% else %}
+                    NOT SET UP
+                {% endif %}
+            </strong>
+
+        </div>
+
+    </section>
+
+
+    {% if error %}
+
+    <div class="farm-form-error">
+
+        {{ error }}
+
+    </div>
+
+    {% endif %}
+
+
+    <form
+        method="POST"
+        class="farm-profile-form"
+    >
+
+
+        <!-- ==========================================
+             BASIC INFORMATION
+        =========================================== -->
+
+        <section class="farm-form-section">
+
+            <div class="farm-form-section-header">
+
+                <span class="farm-section-number">
+                    01
+                </span>
+
+                <div>
+
+                    <span class="section-label">
+                        BASIC INFORMATION
+                    </span>
+
+                    <h2>
+                        Tell us about your farm
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="farm-form-grid">
+
+
+                <div class="farm-field">
+
+                    <label for="farmer_name">
+                        Farmer name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="farmer_name"
+                        name="farmer_name"
+                        placeholder="Your name"
+                        value="{{ profile['farmer_name'] if profile else '' }}"
+                    >
+
+                </div>
+
+
+                <div class="farm-field">
+
+                    <label for="farm_name">
+                        Farm name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="farm_name"
+                        name="farm_name"
+                        placeholder="Example: Green Valley Farm"
+                        value="{{ profile['farm_name'] if profile else '' }}"
+                    >
+
+                </div>
+
+
+                <div class="farm-field">
+
+                    <label for="area">
+                        Farm area
+                    </label>
+
+                    <div class="farm-input-unit">
+
+                        <input
+                            type="number"
+                            id="area"
+                            name="area"
+                            step="0.01"
+                            min="0.01"
+                            placeholder="Example: 2.5"
+                            value="{{ profile['area'] if profile else '' }}"
+                            required
+                        >
+
+                        <span>
+                            acres
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==========================================
+             LOCATION
+        =========================================== -->
+
+        <section class="farm-form-section">
+
+            <div class="farm-form-section-header">
+
+                <span class="farm-section-number">
+                    02
+                </span>
+
+                <div>
+
+                    <span class="section-label">
+                        LOCATION
+                    </span>
+
+                    <h2>
+                        Where is your farm?
+                    </h2>
+
+                    <p class="farm-section-description">
+                        For now, enter your location manually.
+                        GPS and location search will be added
+                        in the next block.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="farm-form-grid">
+
+
+                <div class="farm-field">
+
+                    <label for="village">
+                        Village / Town
+                    </label>
+
+                    <input
+                        type="text"
+                        id="village"
+                        name="village"
+                        placeholder="Example: Bapatla"
+                        value="{{ profile['village'] if profile else '' }}"
+                    >
+
+                </div>
+
+
+                <div class="farm-field">
+
+                    <label for="district">
+                        District
+                    </label>
+
+                    <input
+                        type="text"
+                        id="district"
+                        name="district"
+                        placeholder="Example: Bapatla"
+                        value="{{ profile['district'] if profile else '' }}"
+                    >
+
+                </div>
+
+
+                <div class="farm-field">
+
+                    <label for="state">
+                        State
+                    </label>
+
+                    <input
+                        type="text"
+                        id="state"
+                        name="state"
+                        placeholder="Example: Andhra Pradesh"
+                        value="{{ profile['state'] if profile else '' }}"
+                    >
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==========================================
+             SOIL
+        =========================================== -->
+
+        <section class="farm-form-section">
+
+            <div class="farm-form-section-header">
+
+                <span class="farm-section-number">
+                    03
+                </span>
+
+                <div>
+
+                    <span class="section-label">
+                        SOIL
+                    </span>
+
+                    <h2>
+                        Tell us about your soil
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="farm-form-grid">
+
+
+                <div class="farm-field">
+
+                    <label for="soil_type">
+                        Soil type
+                    </label>
+
+                    <select
+                        id="soil_type"
+                        name="soil_type"
+                    >
+
+                        <option value="">
+                            Select soil type
+                        </option>
+
+                        <option
+                            value="Alluvial"
+                            {% if profile and profile['soil_type'] == 'Alluvial' %}selected{% endif %}
+                        >
+                            Alluvial
+                        </option>
+
+                        <option
+                            value="Black"
+                            {% if profile and profile['soil_type'] == 'Black' %}selected{% endif %}
+                        >
+                            Black soil
+                        </option>
+
+                        <option
+                            value="Red"
+                            {% if profile and profile['soil_type'] == 'Red' %}selected{% endif %}
+                        >
+                            Red soil
+                        </option>
+
+                        <option
+                            value="Loamy"
+                            {% if profile and profile['soil_type'] == 'Loamy' %}selected{% endif %}
+                        >
+                            Loamy
+                        </option>
+
+                        <option
+                            value="Sandy"
+                            {% if profile and profile['soil_type'] == 'Sandy' %}selected{% endif %}
+                        >
+                            Sandy
+                        </option>
+
+                        <option
+                            value="Clay"
+                            {% if profile and profile['soil_type'] == 'Clay' %}selected{% endif %}
+                        >
+                            Clay
+                        </option>
+
+                        <option
+                            value="Laterite"
+                            {% if profile and profile['soil_type'] == 'Laterite' %}selected{% endif %}
+                        >
+                            Laterite
+                        </option>
+
+                        <option
+                            value="Other"
+                            {% if profile and profile['soil_type'] == 'Other' %}selected{% endif %}
+                        >
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="farm-field">
+
+                    <label for="irrigation_type">
+                        Irrigation method
+                    </label>
+
+                    <select
+                        id="irrigation_type"
+                        name="irrigation_type"
+                    >
+
+                        <option value="">
+                            Select method
+                        </option>
+
+                        <option
+                            value="Rainfed"
+                            {% if profile and profile['irrigation_type'] == 'Rainfed' %}selected{% endif %}
+                        >
+                            Rainfed
+                        </option>
+
+                        <option
+                            value="Drip"
+                            {% if profile and profile['irrigation_type'] == 'Drip' %}selected{% endif %}
+                        >
+                            Drip irrigation
+                        </option>
+
+                        <option
+                            value="Sprinkler"
+                            {% if profile and profile['irrigation_type'] == 'Sprinkler' %}selected{% endif %}
+                        >
+                            Sprinkler
+                        </option>
+
+                        <option
+                            value="Canal"
+                            {% if profile and profile['irrigation_type'] == 'Canal' %}selected{% endif %}
+                        >
+                            Canal
+                        </option>
+
+                        <option
+                            value="Borewell"
+                            {% if profile and profile['irrigation_type'] == 'Borewell' %}selected{% endif %}
+                        >
+                            Borewell
+                        </option>
+
+                        <option
+                            value="Other"
+                            {% if profile and profile['irrigation_type'] == 'Other' %}selected{% endif %}
+                        >
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="farm-field">
+
+                    <label for="water_availability">
+                        Water availability
+                    </label>
+
+                    <select
+                        id="water_availability"
+                        name="water_availability"
+                    >
+
+                        <option value="">
+                            Select availability
+                        </option>
+
+                        <option
+                            value="Low"
+                            {% if profile and profile['water_availability'] == 'Low' %}selected{% endif %}
+                        >
+                            Low
+                        </option>
+
+                        <option
+                            value="Moderate"
+                            {% if profile and profile['water_availability'] == 'Moderate' %}selected{% endif %}
+                        >
+                            Moderate
+                        </option>
+
+                        <option
+                            value="Good"
+                            {% if profile and profile['water_availability'] == 'Good' %}selected{% endif %}
+                        >
+                            Good
+                        </option>
+
+                        <option
+                            value="Abundant"
+                            {% if profile and profile['water_availability'] == 'Abundant' %}selected{% endif %}
+                        >
+                            Abundant
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==========================================
+             CURRENT CROP
+        =========================================== -->
+
+        <section class="farm-form-section">
+
+            <div class="farm-form-section-header">
+
+                <span class="farm-section-number">
+                    04
+                </span>
+
+                <div>
+
+                    <span class="section-label">
+                        CURRENT CROP
+                    </span>
+
+                    <h2>
+                        What are you growing?
+                    </h2>
+
+                    <p class="farm-section-description">
+                        This will later connect to crop stage,
+                        calendar, irrigation and crop health.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="farm-form-grid">
+
+
+                <div class="farm-field">
+
+                    <label for="current_crop">
+                        Current crop
+                    </label>
+
+                    <input
+                        type="text"
+                        id="current_crop"
+                        name="current_crop"
+                        placeholder="Example: Rice"
+                        value="{{ profile['current_crop'] if profile else '' }}"
+                    >
+
+                </div>
+
+
+                <div class="farm-field">
+
+                    <label for="sowing_date">
+                        Sowing date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="sowing_date"
+                        name="sowing_date"
+                        value="{{ profile['sowing_date'] if profile else '' }}"
+                    >
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==========================================
+             SAVE
+        =========================================== -->
+
+        <section class="farm-save-section">
+
+            <div>
+
+                <span class="section-label">
+                    FARM PROFILE
+                </span>
+
+                <h2>
+                    Keep your farm information up to date.
+                </h2>
+
+                <p>
+                    SmartFarm will use this information as
+                    future advisory features are connected.
+                </p>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="primary-button farm-save-button"
+            >
+                Save Farm Profile
+                <span aria-hidden="true">→</span>
+            </button>
+
+        </section>
+
+
+    </form>
+
+
+</main>
+
+
+<footer>
+
+    <p>
+        SmartFarm Advisor · AI-assisted agricultural decision support
+    </p>
+
+</footer>
+
+
+</body>
+
+</html>
