@@ -495,5 +495,133 @@
 
 </html>
 
+<script>
 
+async function loadFarmWeather() {
+
+    const status =
+        document.getElementById(
+            "weatherStatus"
+        );
+
+    const location =
+        document.getElementById(
+            "weatherLocation"
+        );
+
+
+    status.textContent =
+        "Loading your farm weather...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/farm-weather"
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            data.status !== "ok"
+        ) {
+
+            throw new Error(
+                data.message ||
+                "Unable to load farm weather."
+            );
+        }
+
+
+        // -----------------------------------------
+        // TEMPERATURE
+        // -----------------------------------------
+
+        const temperatureInput =
+            document.querySelector(
+                '[name="temperature"]'
+            );
+
+        if (
+            temperatureInput &&
+            data.weather.temperature !== null
+        ) {
+
+            temperatureInput.value =
+                Number(
+                    data.weather.temperature
+                ).toFixed(1);
+        }
+
+
+        // -----------------------------------------
+        // HUMIDITY
+        // -----------------------------------------
+
+        const humidityInput =
+            document.querySelector(
+                '[name="humidity"]'
+            );
+
+        if (
+            humidityInput &&
+            data.weather.humidity !== null
+        ) {
+
+            humidityInput.value =
+                Math.round(
+                    data.weather.humidity
+                );
+        }
+
+
+        // -----------------------------------------
+        // RAINFALL
+        // -----------------------------------------
+
+        const rainfallInput =
+            document.querySelector(
+                '[name="rainfall"]'
+            );
+
+        if (
+            rainfallInput &&
+            data.weather.rainfall !== null
+        ) {
+
+            rainfallInput.value =
+                Number(
+                    data.weather.rainfall
+                ).toFixed(1);
+        }
+
+
+        // -----------------------------------------
+        // LOCATION
+        // -----------------------------------------
+
+        location.textContent =
+            data.location;
+
+
+        status.textContent =
+            "✓ Local weather loaded successfully.";
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        status.textContent =
+            error.message ||
+            "Unable to load farm weather.";
+    }
+}
+
+</script>
 
