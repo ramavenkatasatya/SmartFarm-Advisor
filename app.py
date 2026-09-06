@@ -22,15 +22,22 @@ app = Flask(__name__)
 # DATABASE
 # ---------------------------------------------------------
 
-def get_db():
-    connection = sqlite3.connect(DATABASE_PATH)
-    connection.row_factory = sqlite3.Row
-    return connection
+def init_db():
+
+    connection = get_db()
+
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS advisory_history (
+            ...
+        )
+    """)
 
 
-def initialize_database():
+    # ============================================
+    # FARM PROFILE
+    # ============================================
 
-        connection.execute("""
+    connection.execute("""
         CREATE TABLE IF NOT EXISTS farm_profile (
             id INTEGER PRIMARY KEY,
             farmer_name TEXT,
@@ -48,9 +55,10 @@ def initialize_database():
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+
+
     connection.commit()
     connection.close()
-
 
 initialize_database()
 
