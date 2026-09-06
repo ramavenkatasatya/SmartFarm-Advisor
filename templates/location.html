@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Farm Location | SmartFarm Advisor</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .location-page {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 48px 20px 80px;
+        }
+
+        .location-hero {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .location-hero h1 {
+            margin-bottom: 10px;
+        }
+
+        .location-hero p {
+            max-width: 680px;
+            margin: 0 auto;
+            opacity: 0.8;
+        }
+
+        .location-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .location-status {
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: #f4f7f4;
+            margin-bottom: 22px;
+            font-weight: 600;
+        }
+
+        .location-button {
+            border: 0;
+            border-radius: 12px;
+            padding: 14px 22px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .location-button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .location-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 28px;
+        }
+
+        .location-value {
+            background: #f7f9f7;
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .location-value span {
+            display: block;
+            font-size: 12px;
+            opacity: 0.65;
+            margin-bottom: 7px;
+        }
+
+        .location-value strong {
+            font-size: 17px;
+            word-break: break-word;
+        }
+
+        .location-note {
+            margin-top: 24px;
+            font-size: 13px;
+            opacity: 0.7;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 700px) {
+            .location-card {
+                padding: 22px;
+            }
+
+            .location-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="location-page">
+
+        <section class="location-hero">
+            <h1>Farm Location</h1>
+            <p>
+                Save your farm's geographic coordinates so SmartFarm can use
+                location-aware weather, rainfall and agricultural intelligence.
+            </p>
+        </section>
+
+        <section class="location-card">
+
+            <div id="locationStatus" class="location-status">
+                {% if profile and profile["latitude"] is not none %}
+                    Location saved.
+                {% else %}
+                    Your farm location has not been saved yet.
+                {% endif %}
+            </div>
+
+            <button
+                id="locationButton"
+                class="location-button"
+                type="button"
+                onclick="detectLocation()"
+            >
+                Use My Current Location
+            </button>
+
+            <div class="location-details">
+                <div class="location-value">
+                    <span>Latitude</span>
+                    <strong id="latitude">
+                        {% if profile and profile["latitude"] is not none %}
+                            {{ "%.6f"|format(profile["latitude"]) }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <div class="location-value">
+                    <span>Longitude</span>
+                    <strong id="longitude">
+                        {% if profile and profile["longitude"] is not none %}
+                            {{ "%.6f"|format(profile["longitude"]) }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </strong>
+                </div>
+
+                <div class="location-value">
+                    <span>Accuracy</span>
+                    <strong id="accuracy">
+                        {% if profile and profile["location_accuracy"] is not none %}
+                            {{ "%.0f"|format(profile["location_accuracy"]) }} m
+                        {% else %}
+                            —
+                        {% endif %}
+                    </strong>
+                </div>
+            </div>
+
+            <p class="location-note">
+                Your browser will ask for location permission. SmartFarm only
+                stores the coordinates needed for farm intelligence. A higher
+                accuracy value means the reported position is less precise.
+            </p>
+
+        </section>
+
+    </main>
+
+    <script>
+        async function detectLocation() {
+            const button = document.getElementById("locationButton");
+            const status = document.getElementById("locationStatus");
+
+            if (!navigator.geolocation) {
+                status.textContent =
+                    "Location is not supported by this browser.";
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = "Detecting location...";
+            status.textContent = "Requesting your location permission...";
+
+            navigator.geolocation.getCurrentPosition(
+                async function(position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+
+                    try {
+                        const response = await fetch("/api/location", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                latitude: latitude,
+                                longitude: longitude,
+                                accuracy: accuracy
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (!response.ok || result.status !== "ok") {
+                            throw new Error(
+                                result.message || "Unable to save location."
+                            );
+                        }
+
+                        document.getElementById("latitude").textContent =
+                            latitude.toFixed(6);
+
+                        document.getElementById("longitude").textContent =
+                            longitude.toFixed(6);
+
+                        document.getElementById("accuracy").textContent =
+                            Math.round(accuracy) + " m";
+
+                        status.textContent =
+                            "Farm location saved successfully.";
+
+                    } catch (error) {
+                        status.textContent =
+                            error.message || "Unable to save location.";
+                    } finally {
+                        button.disabled = false;
+                        button.textContent = "Use My Current Location";
+                    }
+                },
+                function(error) {
+                    let message = "Unable to get your location.";
+
+                    if (error.code === 1) {
+                        message =
+                            "Location permission was denied. Allow location access and try again.";
+                    } else if (error.code === 2) {
+                        message =
+                            "Your location could not be determined. Check GPS/network access and try again.";
+                    } else if (error.code === 3) {
+                        message =
+                            "Location request timed out. Please try again.";
+                    }
+
+                    status.textContent = message;
+                    button.disabled = false;
+                    button.textContent = "Use My Current Location";
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 300000
+                }
+            );
+        }
+    </script>
+
+</body>
+</html>
