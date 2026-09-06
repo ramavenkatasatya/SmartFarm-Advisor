@@ -1157,3 +1157,75 @@ if __name__ == "__main__":
         port=port,
         debug=True
     )
+@app.route("/api/farm-weather")
+def farm_weather():
+
+    connection = get_db()
+
+    profile = connection.execute("""
+        SELECT
+            latitude,
+            longitude,
+            location_name,
+            district,
+            state
+        FROM farm_profile
+        WHERE id = 1
+    """).fetchone()
+
+    connection.close()
+
+    if not profile:
+        return jsonify({
+            "status": "error",
+            "message":
+                "Farm profile not found."
+        }), 404
+
+    if (
+        profile["latitude"] is None
+        or
+        profile["longitude"] is None
+    ):
+
+        return jsonify({
+            "status": "error",
+            "message":
+                "Please detect your farm location first."
+        }), 400
+
+    try:
+
+        weather = get_weather(
+            profile["latitude"],
+            profile["longitude"]
+        )
+
+        return jsonify({
+
+            "status": "ok",
+
+            "location":
+                profile["location_name"]
+                or
+                profile["district"]
+                or
+                profile["state"]
+                or
+                "Farm location",
+
+            "weather": weather
+        })
+
+    except Exception as error:
+
+        print(
+            "Farm weather error:",
+            error
+        )
+
+        return jsonify({
+            "status": "error",
+            "message":
+                "Unable to retrieve farm weather."
+        }), 500
