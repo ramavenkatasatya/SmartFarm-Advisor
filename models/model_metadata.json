@@ -1,0 +1,29 @@
+{
+    "model": "RandomForestClassifier",
+    "features": [
+        "N",
+        "P",
+        "K",
+        "temperature",
+        "humidity",
+        "ph",
+        "rainfall"
+    ],
+    "target": "label",
+    "n_estimators": 300,
+    "random_state": 42,
+    "dataset_rows": 2200,
+    "number_of_classes": 22,
+    "accuracy": 0.9932,
+    "macro_f1": 0.9932,
+    "weighted_f1": 0.9932,
+    "feature_importance": {
+        "N": 0.106658,
+        "P": 0.149166,
+        "K": 0.176279,
+        "temperature": 0.076202,
+        "humidity": 0.217655,
+        "ph": 0.056784,
+        "rainfall": 0.217256
+    }
+}

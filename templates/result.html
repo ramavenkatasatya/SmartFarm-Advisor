@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Farm Advisory | SmartFarm</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+
+<header class="navbar">
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            🌱
+        </div>
+
+        <div>
+            <h2>SmartFarm</h2>
+            <span>Advisor</span>
+        </div>
+
+    </div>
+
+
+    <nav>
+
+        <a href="{{ url_for('home') }}">
+            New Analysis
+        </a>
+
+        <a href="{{ url_for('history') }}">
+            History
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="container">
+
+
+    <section class="result-hero">
+
+        <span class="badge">
+            ADVISORY GENERATED
+        </span>
+
+        <h1>
+            Your farm advisory
+        </h1>
+
+        <p>
+            Based on the soil and environmental conditions
+            you provided.
+        </p>
+
+    </section>
+
+
+    <!-- TOP CROP -->
+
+    <section class="recommendation-card">
+
+        <div>
+
+            <span class="section-label">
+                TOP RECOMMENDATION
+            </span>
+
+            <h2>
+                {{ crop }}
+            </h2>
+
+            <p>
+                Highest-ranked crop from the machine learning model.
+            </p>
+
+        </div>
+
+
+        <div class="confidence">
+
+            <strong>
+                {{ confidence }}%
+            </strong>
+
+            <span>
+                confidence
+            </span>
+
+        </div>
+
+    </section>
+
+
+    <!-- OTHER PREDICTIONS -->
+
+    <section class="result-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-label">
+                    MODEL RESULTS
+                </span>
+
+                <h2>
+                    Recommended crops
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="crop-results">
+
+            {% for prediction in predictions %}
+
+            <div class="crop-result">
+
+                <div class="crop-rank">
+                    {{ loop.index }}
+                </div>
+
+                <div class="crop-info">
+
+                    <strong>
+                        {{ prediction.crop }}
+                    </strong>
+
+                    <div class="progress">
+
+                        <div
+                            class="progress-bar"
+                            style="width: {{ prediction.confidence | int }}%;"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+                <strong>
+                    {{ prediction.confidence }}%
+                </strong>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    <!-- FARM INPUTS -->
+
+    <section class="result-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-label">
+                    FARM PROFILE
+                </span>
+
+                <h2>
+                    Analysis conditions
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="metric-grid">
+
+            <div class="metric">
+                <span>Nitrogen</span>
+                <strong>{{ nitrogen }}</strong>
+            </div>
+
+            <div class="metric">
+                <span>Phosphorus</span>
+                <strong>{{ phosphorus }}</strong>
+            </div>
+
+            <div class="metric">
+                <span>Potassium</span>
+                <strong>{{ potassium }}</strong>
+            </div>
+
+            <div class="metric">
+                <span>Temperature</span>
+                <strong>{{ temperature }}°C</strong>
+            </div>
+
+            <div class="metric">
+                <span>Humidity</span>
+                <strong>{{ humidity }}%</strong>
+            </div>
+
+            <div class="metric">
+                <span>Soil pH</span>
+                <strong>{{ ph }}</strong>
+            </div>
+
+            <div class="metric">
+                <span>Rainfall</span>
+                <strong>{{ rainfall }} mm</strong>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ADVISORY -->
+
+    <section class="result-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-label">
+                    ACTION PLAN
+                </span>
+
+                <h2>
+                    What you should do
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="advisory-grid">
+
+
+            <div class="advisory-card">
+
+                <div class="advisory-icon">
+                    💧
+                </div>
+
+                <h3>
+                    Irrigation
+                </h3>
+
+                <p>
+                    {{ advisory.irrigation }}
+                </p>
+
+            </div>
+
+
+            <div class="advisory-card">
+
+                <div class="advisory-icon">
+                    🌿
+                </div>
+
+                <h3>
+                    Fertilizer
+                </h3>
+
+                <p>
+                    {{ advisory.fertilizer }}
+                </p>
+
+            </div>
+
+
+            <div class="advisory-card">
+
+                <div class="advisory-icon">
+                    🧪
+                </div>
+
+                <h3>
+                    Soil & Environment
+                </h3>
+
+                <p>
+                    {{ advisory.soil_advice }}
+                </p>
+
+            </div>
+
+
+            <div class="advisory-card wide">
+
+                <div class="advisory-icon">
+                    💡
+                </div>
+
+                <h3>
+                    SmartFarm recommendation
+                </h3>
+
+                <p>
+                    {{ advisory.general_advice }}
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <div class="result-actions">
+
+        <a
+            href="{{ url_for('home') }}"
+            class="primary-button"
+        >
+            New Analysis →
+        </a>
+
+        <a
+            href="{{ url_for('history') }}"
+            class="secondary-button"
+        >
+            View History
+        </a>
+
+    </div>
+
+
+</main>
+
+
+<footer>
+
+    <p>
+        SmartFarm Advisor · AI-assisted agricultural decision support
+    </p>
+
+</footer>
+
+
+</body>
+
+</html>

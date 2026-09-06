@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>SmartFarm Advisor</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="brand">
+        <div class="brand-icon">🌱</div>
+
+        <div>
+            <h2>SmartFarm</h2>
+            <span>Advisor</span>
+        </div>
+    </div>
+
+    <nav>
+
+        <a href="{{ url_for('home') }}">
+            Dashboard
+        </a>
+
+        <a href="{{ url_for('history') }}">
+            History
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="container">
+
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="hero-text">
+
+            <span class="badge">
+                AI-POWERED AGRICULTURE
+            </span>
+
+            <h1>
+                Smarter decisions.<br>
+                Better farming.
+            </h1>
+
+            <p>
+                Get crop recommendations and farm-specific
+                advisory based on soil and environmental conditions.
+            </p>
+
+        </div>
+
+
+        <div class="hero-card">
+
+            <div class="hero-card-icon">
+                🌾
+            </div>
+
+            <div>
+                <strong>Smart Crop Advisory</strong>
+
+                <p>
+                    ML-powered recommendations
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    {% if error %}
+
+    <div class="alert error">
+        {{ error }}
+    </div>
+
+    {% endif %}
+
+
+    <!-- INPUT FORM -->
+
+    <section class="form-section">
+
+        <div class="section-heading">
+
+            <div>
+                <span class="section-label">
+                    FARM ANALYSIS
+                </span>
+
+                <h2>
+                    Enter your farm conditions
+                </h2>
+
+                <p>
+                    Provide the available soil and environmental
+                    measurements to generate an advisory.
+                </p>
+            </div>
+
+        </div>
+
+
+        <form
+            method="POST"
+            action="{{ url_for('advisory') }}"
+            class="farm-form"
+        >
+
+
+            <!-- SOIL -->
+
+            <div class="form-card">
+
+                <div class="card-title">
+
+                    <div class="card-icon">
+                        🧪
+                    </div>
+
+                    <div>
+                        <h3>Soil nutrients</h3>
+                        <p>NPK values from your soil test</p>
+                    </div>
+
+                </div>
+
+
+                <div class="input-grid">
+
+                    <div class="input-group">
+
+                        <label>
+                            Nitrogen (N)
+                        </label>
+
+                        <input
+                            type="number"
+                            name="nitrogen"
+                            step="0.01"
+                            placeholder="e.g. 90"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label>
+                            Phosphorus (P)
+                        </label>
+
+                        <input
+                            type="number"
+                            name="phosphorus"
+                            step="0.01"
+                            placeholder="e.g. 42"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label>
+                            Potassium (K)
+                        </label>
+
+                        <input
+                            type="number"
+                            name="potassium"
+                            step="0.01"
+                            placeholder="e.g. 43"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label>
+                            Soil pH
+                        </label>
+
+                        <input
+                            type="number"
+                            name="ph"
+                            step="0.01"
+                            min="0"
+                            max="14"
+                            placeholder="e.g. 6.5"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- WEATHER -->
+
+            <div class="form-card">
+
+                <div class="card-title">
+
+                    <div class="card-icon">
+                        ☀️
+                    </div>
+
+                    <div>
+                        <h3>Environmental conditions</h3>
+                        <p>Current field conditions</p>
+                    </div>
+
+                </div>
+
+
+                <div class="input-grid">
+
+                    <div class="input-group">
+
+                        <label>
+                            Temperature (°C)
+                        </label>
+
+                        <input
+                            type="number"
+                            name="temperature"
+                            step="0.01"
+                            placeholder="e.g. 25"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label>
+                            Humidity (%)
+                        </label>
+
+                        <input
+                            type="number"
+                            name="humidity"
+                            step="0.01"
+                            min="0"
+                            max="100"
+                            placeholder="e.g. 70"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label>
+                            Rainfall (mm)
+                        </label>
+
+                        <input
+                            type="number"
+                            name="rainfall"
+                            step="0.01"
+                            min="0"
+                            placeholder="e.g. 120"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+
+                Generate Farm Advisory
+
+                <span>→</span>
+
+            </button>
+
+
+        </form>
+
+    </section>
+
+
+    <!-- HOW IT WORKS -->
+
+    <section class="how-section">
+
+        <div class="section-heading center">
+
+            <span class="section-label">
+                HOW IT WORKS
+            </span>
+
+            <h2>
+                From farm data to action
+            </h2>
+
+        </div>
+
+
+        <div class="steps">
+
+            <div class="step">
+
+                <div class="step-number">
+                    01
+                </div>
+
+                <h3>
+                    Enter farm data
+                </h3>
+
+                <p>
+                    Provide your soil nutrients and
+                    environmental conditions.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    02
+                </div>
+
+                <h3>
+                    ML analysis
+                </h3>
+
+                <p>
+                    The trained model evaluates the
+                    suitability of different crops.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    03
+                </div>
+
+                <h3>
+                    Get advisory
+                </h3>
+
+                <p>
+                    Receive crop recommendations and
+                    practical farm actions.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    <p>
+        SmartFarm Advisor · AI-assisted agricultural decision support
+    </p>
+
+</footer>
+
+
+<script
+    src="{{ url_for('static', filename='js/script.js') }}"
+></script>
+
+</body>
+
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>History | SmartFarm Advisor</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+
+<header class="navbar">
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            🌱
+        </div>
+
+        <div>
+            <h2>SmartFarm</h2>
+            <span>Advisor</span>
+        </div>
+
+    </div>
+
+
+    <nav>
+
+        <a href="{{ url_for('home') }}">
+            Dashboard
+        </a>
+
+        <a href="{{ url_for('history') }}">
+            History
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="container">
+
+
+    <section class="result-hero">
+
+        <span class="badge">
+            FARM RECORDS
+        </span>
+
+        <h1>
+            Advisory history
+        </h1>
+
+        <p>
+            Review previous crop recommendations and farm conditions.
+        </p>
+
+    </section>
+
+
+    {% if records %}
+
+
+    <div class="history-header">
+
+        <h2>
+            Recent analyses
+        </h2>
+
+
+        <form
+            method="POST"
+            action="{{ url_for('delete_history') }}"
+            onsubmit="return confirm('Delete all advisory history?')"
+        >
+
+            <button
+                type="submit"
+                class="danger-button"
+            >
+                Clear History
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <div class="history-list">
+
+        {% for record in records %}
+
+        <div class="history-card">
+
+            <div class="history-date">
+
+                <span>
+                    {{ record.created_at }}
+                </span>
+
+            </div>
+
+
+            <div class="history-main">
+
+                <div>
+
+                    <span class="section-label">
+                        RECOMMENDED CROP
+                    </span>
+
+                    <h3>
+                        {{ record.recommended_crop }}
+                    </h3>
+
+                </div>
+
+
+                <div class="history-confidence">
+
+                    <strong>
+                        {{ record.confidence }}%
+                    </strong>
+
+                    <span>
+                        confidence
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="history-metrics">
+
+                <span>
+                    N: {{ record.nitrogen }}
+                </span>
+
+                <span>
+                    P: {{ record.phosphorus }}
+                </span>
+
+                <span>
+                    K: {{ record.potassium }}
+                </span>
+
+                <span>
+                    pH: {{ record.ph }}
+                </span>
+
+                <span>
+                    Rainfall: {{ record.rainfall }} mm
+                </span>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% else %}
+
+
+    <div class="empty-state">
+
+        <div>
+            🌱
+        </div>
+
+        <h2>
+            No advisory history yet
+        </h2>
+
+        <p>
+            Generate your first farm advisory to see it here.
+        </p>
+
+        <a
+            href="{{ url_for('home') }}"
+            class="primary-button"
+        >
+            Generate Advisory →
+        </a>
+
+    </div>
+
+
+    {% endif %}
+
+
+</main>
+
+
+<footer>
+
+    <p>
+        SmartFarm Advisor · AI-assisted agricultural decision support
+    </p>
+
+</footer>
+
+
+</body>
+
+</html>
