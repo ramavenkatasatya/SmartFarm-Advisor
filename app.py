@@ -102,7 +102,7 @@ def advisory():
     except (TypeError, ValueError):
 
         return render_template(
-            "index.html",
+            "advisor.html",
             error="Please enter valid numerical values."
         )
 
@@ -128,7 +128,7 @@ def advisory():
     if not predictions:
 
         return render_template(
-            "index.html",
+            "advisor.html",
             error="Unable to generate a crop prediction. Please train the model first."
         )
 
