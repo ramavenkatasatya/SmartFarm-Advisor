@@ -40,19 +40,25 @@
     <nav aria-label="Main navigation">
 
         <a href="{{ url_for('home') }}">
-            Home
-        </a>
+        Home
+    </a>
 
-        <a
-            href="{{ url_for('advisor') }}"
-            class="active"
-        >
-            Crop Advisor
-        </a>
+    <a
+        href="{{ url_for('dashboard') }}"
+    >
+        Dashboard
+    </a>
 
-        <a href="{{ url_for('history') }}">
-            History
-        </a>
+    <a
+        href="{{ url_for('advisor') }}"
+        class="active"
+    >
+        Crop Advisor
+    </a>
+
+    <a href="{{ url_for('history') }}">
+        History
+    </a>
         
 
     </nav>
