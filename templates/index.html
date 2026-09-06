@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -24,15 +25,20 @@
 <header class="navbar">
 
     <div class="brand">
-        <div class="brand-icon">🌱</div>
+
+        <img
+            src="{{ url_for('static', filename='images/logo.png') }}"
+            alt="SmartFarm Advisor"
+        >
 
         <div>
             <h2>SmartFarm</h2>
             <span>Advisor</span>
         </div>
+
     </div>
 
-    <nav>
+    <nav aria-label="Main navigation">
 
         <a href="{{ url_for('home') }}">
             Dashboard
@@ -108,6 +114,7 @@
         <div class="section-heading">
 
             <div>
+
                 <span class="section-label">
                     FARM ANALYSIS
                 </span>
@@ -120,6 +127,7 @@
                     Provide the available soil and environmental
                     measurements to generate an advisory.
                 </p>
+
             </div>
 
         </div>
@@ -143,8 +151,15 @@
                     </div>
 
                     <div>
-                        <h3>Soil nutrients</h3>
-                        <p>NPK values from your soil test</p>
+
+                        <h3>
+                            Soil nutrients
+                        </h3>
+
+                        <p>
+                            NPK values from your soil test
+                        </p>
+
                     </div>
 
                 </div>
@@ -152,14 +167,16 @@
 
                 <div class="input-grid">
 
+
                     <div class="input-group">
 
-                        <label>
+                        <label for="nitrogen">
                             Nitrogen (N)
                         </label>
 
                         <input
                             type="number"
+                            id="nitrogen"
                             name="nitrogen"
                             step="0.01"
                             placeholder="e.g. 90"
@@ -171,12 +188,13 @@
 
                     <div class="input-group">
 
-                        <label>
+                        <label for="phosphorus">
                             Phosphorus (P)
                         </label>
 
                         <input
                             type="number"
+                            id="phosphorus"
                             name="phosphorus"
                             step="0.01"
                             placeholder="e.g. 42"
@@ -188,12 +206,13 @@
 
                     <div class="input-group">
 
-                        <label>
+                        <label for="potassium">
                             Potassium (K)
                         </label>
 
                         <input
                             type="number"
+                            id="potassium"
                             name="potassium"
                             step="0.01"
                             placeholder="e.g. 43"
@@ -205,12 +224,13 @@
 
                     <div class="input-group">
 
-                        <label>
+                        <label for="ph">
                             Soil pH
                         </label>
 
                         <input
                             type="number"
+                            id="ph"
                             name="ph"
                             step="0.01"
                             min="0"
@@ -237,8 +257,15 @@
                     </div>
 
                     <div>
-                        <h3>Environmental conditions</h3>
-                        <p>Current field conditions</p>
+
+                        <h3>
+                            Environmental conditions
+                        </h3>
+
+                        <p>
+                            Current field conditions
+                        </p>
+
                     </div>
 
                 </div>
@@ -246,14 +273,16 @@
 
                 <div class="input-grid">
 
+
                     <div class="input-group">
 
-                        <label>
+                        <label for="temperature">
                             Temperature (°C)
                         </label>
 
                         <input
                             type="number"
+                            id="temperature"
                             name="temperature"
                             step="0.01"
                             placeholder="e.g. 25"
@@ -265,12 +294,13 @@
 
                     <div class="input-group">
 
-                        <label>
+                        <label for="humidity">
                             Humidity (%)
                         </label>
 
                         <input
                             type="number"
+                            id="humidity"
                             name="humidity"
                             step="0.01"
                             min="0"
@@ -284,12 +314,13 @@
 
                     <div class="input-group">
 
-                        <label>
+                        <label for="rainfall">
                             Rainfall (mm)
                         </label>
 
                         <input
                             type="number"
+                            id="rainfall"
                             name="rainfall"
                             step="0.01"
                             min="0"
@@ -311,7 +342,9 @@
 
                 Generate Farm Advisory
 
-                <span>→</span>
+                <span aria-hidden="true">
+                    →
+                </span>
 
             </button>
 
@@ -339,6 +372,7 @@
 
 
         <div class="steps">
+
 
             <div class="step">
 
@@ -393,6 +427,7 @@
 
             </div>
 
+
         </div>
 
     </section>
@@ -416,3 +451,33 @@
 </body>
 
 </html>
+```
+
+### Before you run it, verify this
+
+Your logo must be located **exactly** at:
+
+```text
+static/
+└── images/
+    └── logo.png
+```
+
+And your Flask project should have these endpoint functions:
+
+```python
+home
+history
+advisory
+```
+
+The important change is that the logo is now properly loaded with:
+
+```html
+<img
+    src="{{ url_for('static', filename='images/logo.png') }}"
+    alt="SmartFarm Advisor"
+>
+```
+
+I also added `for`/`id` connections to the form labels, which improves accessibility without changing how your form works.

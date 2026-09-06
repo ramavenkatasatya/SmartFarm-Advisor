@@ -92,23 +92,57 @@ NAVBAR
     align-items: center;
 
     gap: 12px;
+
+    /* Prevent oversized logo from affecting navbar */
+    min-width: 0;
 }
 
 
-.brand-icon {
+/* --------------------------------------------------
+SMARTFARM LOGO
+-------------------------------------------------- */
 
-    width: 42px;
-    height: 42px;
+/*
+   The old .brand-icon rule was for the 🌱 emoji.
+   The new logo is an actual image, so we control
+   the image dimensions here.
+*/
 
-    display: grid;
+.brand img {
 
-    place-items: center;
+    width: 42px !important;
 
-    border-radius: 12px;
+    height: 42px !important;
 
-    background: var(--green-light);
+    max-width: 42px !important;
 
-    font-size: 22px;
+    max-height: 42px !important;
+
+    min-width: 42px;
+
+    min-height: 42px;
+
+    object-fit: contain;
+
+    object-position: center;
+
+    display: block;
+
+    flex: 0 0 42px;
+
+    border: none;
+
+}
+
+
+/*
+   If the PNG itself contains transparent space,
+   this keeps the image visually contained.
+*/
+
+.brand {
+
+    overflow: visible;
 }
 
 
@@ -383,6 +417,7 @@ FORM
 .card-icon {
 
     width: 45px;
+
     height: 45px;
 
     border-radius: 13px;
@@ -1294,6 +1329,26 @@ RESPONSIVE
     .secondary-button {
 
         width: 100%;
+    }
+
+
+    /* Keep logo fixed on small screens too */
+
+    .brand img {
+
+        width: 38px !important;
+
+        height: 38px !important;
+
+        max-width: 38px !important;
+
+        max-height: 38px !important;
+
+        min-width: 38px;
+
+        min-height: 38px;
+
+        flex-basis: 38px;
     }
 
 }
