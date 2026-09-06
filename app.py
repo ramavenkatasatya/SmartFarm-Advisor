@@ -69,8 +69,16 @@ initialize_database()
 
 @app.route("/")
 def home():
-
     return render_template("index.html")
+
+
+# ---------------------------------------------------------
+# CROP ADVISOR
+# ---------------------------------------------------------
+
+@app.route("/advisor")
+def advisor():
+    return render_template("advisor.html")
 
 
 # ---------------------------------------------------------
