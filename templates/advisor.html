@@ -40,7 +40,14 @@
     <nav aria-label="Main navigation">
 
         <a href="{{ url_for('home') }}">
-            Dashboard
+            Home
+        </a>
+
+        <a
+            href="{{ url_for('advisor') }}"
+            class="active"
+        >
+            Crop Advisor
         </a>
 
         <a href="{{ url_for('history') }}">
