@@ -80,7 +80,34 @@ def home():
 def advisor():
     return render_template("advisor.html")
 
+# ---------------------------------------------------------
+# DASHBOARD
+# ---------------------------------------------------------
 
+@app.route("/dashboard")
+def dashboard():
+
+    connection = get_db()
+
+    latest = connection.execute("""
+        SELECT *
+        FROM advisory_history
+        ORDER BY id DESC
+        LIMIT 1
+    """).fetchone()
+
+    total_advisories = connection.execute("""
+        SELECT COUNT(*) AS count
+        FROM advisory_history
+    """).fetchone()["count"]
+
+    connection.close()
+
+    return render_template(
+        "dashboard.html",
+        latest=latest,
+        total_advisories=total_advisories
+    )
 # ---------------------------------------------------------
 # GENERATE ADVISORY
 # ---------------------------------------------------------
