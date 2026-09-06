@@ -41,12 +41,23 @@
     <nav>
 
         <a href="{{ url_for('home') }}">
-            Dashboard
-        </a>
+        Home
+    </a>
 
-        <a href="{{ url_for('history') }}">
-            History
-        </a>
+    <a href="{{ url_for('dashboard') }}">
+        Dashboard
+    </a>
+
+    <a href="{{ url_for('advisor') }}">
+        Crop Advisor
+    </a>
+
+    <a
+        href="{{ url_for('history') }}"
+        class="active"
+    >
+        History
+    </a>
 
     </nav>
 
