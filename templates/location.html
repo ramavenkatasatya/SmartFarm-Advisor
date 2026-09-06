@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Farm Location | SmartFarm Advisor</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
 
     <style>
+
         .location-page {
             max-width: 1000px;
             margin: 0 auto;
@@ -28,14 +38,17 @@
             max-width: 680px;
             margin: 0 auto;
             opacity: 0.8;
+            line-height: 1.6;
         }
 
         .location-card {
             background: #fff;
             border-radius: 20px;
             padding: 32px;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow:
+                0 12px 35px rgba(0, 0, 0, 0.08);
+            border:
+                1px solid rgba(0, 0, 0, 0.06);
         }
 
         .location-status {
@@ -60,9 +73,10 @@
             cursor: wait;
         }
 
-        .location-details {
+        .location-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns:
+                repeat(2, 1fr);
             gap: 16px;
             margin-top: 28px;
         }
@@ -85,6 +99,49 @@
             word-break: break-word;
         }
 
+        .weather-section {
+            margin-top: 32px;
+        }
+
+        .weather-section h2 {
+            margin-bottom: 16px;
+        }
+
+        .weather-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .weather-card {
+            background:
+                linear-gradient(
+                    135deg,
+                    #f4f9f4,
+                    #edf5ef
+                );
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .weather-card .weather-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .weather-card span {
+            display: block;
+            font-size: 12px;
+            opacity: 0.65;
+        }
+
+        .weather-card strong {
+            display: block;
+            margin-top: 5px;
+            font-size: 22px;
+        }
+
         .location-note {
             margin-top: 24px;
             font-size: 13px;
@@ -92,182 +149,588 @@
             line-height: 1.6;
         }
 
+        .success {
+            color: #1d6b35;
+        }
+
+        .error {
+            color: #a83232;
+        }
+
         @media (max-width: 700px) {
+
             .location-card {
                 padding: 22px;
             }
 
-            .location-details {
+            .location-grid,
+            .weather-grid {
                 grid-template-columns: 1fr;
             }
+
         }
+
     </style>
+
 </head>
 
 <body>
 
-    <main class="location-page">
+<main class="location-page">
 
-        <section class="location-hero">
-            <h1>Farm Location</h1>
-            <p>
-                Save your farm's geographic coordinates so SmartFarm can use
-                location-aware weather, rainfall and agricultural intelligence.
-            </p>
-        </section>
+    <section class="location-hero">
 
-        <section class="location-card">
+        <h1>Farm Location</h1>
 
-            <div id="locationStatus" class="location-status">
-                {% if profile and profile["latitude"] is not none %}
-                    Location saved.
-                {% else %}
-                    Your farm location has not been saved yet.
-                {% endif %}
+        <p>
+            Use your current location to automatically
+            retrieve your farm area and local weather
+            conditions for smarter crop recommendations.
+        </p>
+
+    </section>
+
+
+    <section class="location-card">
+
+        <div
+            id="locationStatus"
+            class="location-status"
+        >
+            {% if profile and profile["latitude"] is not none %}
+
+                Location saved.
+
+            {% else %}
+
+                Your farm location has not been detected yet.
+
+            {% endif %}
+
+        </div>
+
+
+        <button
+            id="locationButton"
+            class="location-button"
+            type="button"
+            onclick="detectLocation()"
+        >
+            📍 Use My Current Location
+        </button>
+
+
+        <div class="location-grid">
+
+            <div class="location-value">
+
+                <span>Location</span>
+
+                <strong id="locationName">
+
+                    {% if profile and profile["location_name"] %}
+
+                        {{ profile["location_name"] }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </strong>
+
             </div>
 
-            <button
-                id="locationButton"
-                class="location-button"
-                type="button"
-                onclick="detectLocation()"
-            >
-                Use My Current Location
-            </button>
 
-            <div class="location-details">
-                <div class="location-value">
-                    <span>Latitude</span>
-                    <strong id="latitude">
-                        {% if profile and profile["latitude"] is not none %}
-                            {{ "%.6f"|format(profile["latitude"]) }}
-                        {% else %}
-                            —
-                        {% endif %}
-                    </strong>
-                </div>
+            <div class="location-value">
 
-                <div class="location-value">
-                    <span>Longitude</span>
-                    <strong id="longitude">
-                        {% if profile and profile["longitude"] is not none %}
-                            {{ "%.6f"|format(profile["longitude"]) }}
-                        {% else %}
-                            —
-                        {% endif %}
-                    </strong>
-                </div>
+                <span>District</span>
 
-                <div class="location-value">
-                    <span>Accuracy</span>
-                    <strong id="accuracy">
-                        {% if profile and profile["location_accuracy"] is not none %}
-                            {{ "%.0f"|format(profile["location_accuracy"]) }} m
-                        {% else %}
-                            —
-                        {% endif %}
-                    </strong>
-                </div>
+                <strong id="district">
+
+                    {% if profile and profile["district"] %}
+
+                        {{ profile["district"] }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </strong>
+
             </div>
 
-            <p class="location-note">
-                Your browser will ask for location permission. SmartFarm only
-                stores the coordinates needed for farm intelligence. A higher
-                accuracy value means the reported position is less precise.
-            </p>
+
+            <div class="location-value">
+
+                <span>State</span>
+
+                <strong id="state">
+
+                    {% if profile and profile["state"] %}
+
+                        {{ profile["state"] }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+            <div class="location-value">
+
+                <span>Latitude</span>
+
+                <strong id="latitude">
+
+                    {% if profile and profile["latitude"] is not none %}
+
+                        {{ "%.6f"|format(profile["latitude"]) }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+            <div class="location-value">
+
+                <span>Longitude</span>
+
+                <strong id="longitude">
+
+                    {% if profile and profile["longitude"] is not none %}
+
+                        {{ "%.6f"|format(profile["longitude"]) }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+            <div class="location-value">
+
+                <span>GPS Accuracy</span>
+
+                <strong id="accuracy">
+
+                    {% if profile and profile["location_accuracy"] is not none %}
+
+                        {{ "%.0f"|format(profile["location_accuracy"]) }} m
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <section class="weather-section">
+
+            <h2>Local Weather</h2>
+
+            <div class="weather-grid">
+
+                <div class="weather-card">
+
+                    <div class="weather-icon">🌡️</div>
+
+                    <span>Temperature</span>
+
+                    <strong id="temperature">
+
+                        {% if profile and profile["weather_temperature"] is not none %}
+
+                            {{ "%.1f"|format(profile["weather_temperature"]) }} °C
+
+                        {% else %}
+
+                            —
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+
+                <div class="weather-card">
+
+                    <div class="weather-icon">💧</div>
+
+                    <span>Humidity</span>
+
+                    <strong id="humidity">
+
+                        {% if profile and profile["weather_humidity"] is not none %}
+
+                            {{ "%.0f"|format(profile["weather_humidity"]) }} %
+
+                        {% else %}
+
+                            —
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+
+                <div class="weather-card">
+
+                    <div class="weather-icon">🌧️</div>
+
+                    <span>7-Day Rainfall</span>
+
+                    <strong id="rainfall">
+
+                        {% if profile and profile["weather_rainfall"] is not none %}
+
+                            {{ "%.1f"|format(profile["weather_rainfall"]) }} mm
+
+                        {% else %}
+
+                            —
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+            </div>
 
         </section>
 
-    </main>
 
-    <script>
-        async function detectLocation() {
-            const button = document.getElementById("locationButton");
-            const status = document.getElementById("locationStatus");
+        <p class="location-note">
 
-            if (!navigator.geolocation) {
+            Your browser will ask for location permission.
+            SmartFarm uses the coordinates to identify the
+            farm area and retrieve location-specific weather.
+            Location access is only requested when you click
+            the button.
+
+        </p>
+
+    </section>
+
+</main>
+
+
+<script>
+
+async function detectLocation() {
+
+    const button =
+        document.getElementById(
+            "locationButton"
+        );
+
+    const status =
+        document.getElementById(
+            "locationStatus"
+        );
+
+
+    if (!navigator.geolocation) {
+
+        status.textContent =
+            "Location is not supported by this browser.";
+
+        status.className =
+            "location-status error";
+
+        return;
+    }
+
+
+    button.disabled = true;
+
+    button.textContent =
+        "📍 Detecting Location...";
+
+    status.textContent =
+        "Requesting location permission...";
+
+    status.className =
+        "location-status";
+
+
+    navigator.geolocation.getCurrentPosition(
+
+        async function(position) {
+
+            const latitude =
+                position.coords.latitude;
+
+            const longitude =
+                position.coords.longitude;
+
+            const accuracy =
+                position.coords.accuracy;
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/api/location",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                latitude:
+                                    latitude,
+
+                                longitude:
+                                    longitude,
+
+                                accuracy:
+                                    accuracy
+                            })
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (
+                    !response.ok ||
+                    result.status !== "ok"
+                ) {
+
+                    throw new Error(
+                        result.message ||
+                        "Unable to save location."
+                    );
+                }
+
+
+                const location =
+                    result.location;
+
+                const weather =
+                    result.weather;
+
+
+                // -----------------------------------------
+                // LOCATION
+                // -----------------------------------------
+
+                document
+                    .getElementById(
+                        "locationName"
+                    )
+                    .textContent =
+                        location.name || "Detected";
+
+
+                document
+                    .getElementById(
+                        "district"
+                    )
+                    .textContent =
+                        location.district || "—";
+
+
+                document
+                    .getElementById(
+                        "state"
+                    )
+                    .textContent =
+                        location.state || "—";
+
+
+                document
+                    .getElementById(
+                        "latitude"
+                    )
+                    .textContent =
+                        latitude.toFixed(6);
+
+
+                document
+                    .getElementById(
+                        "longitude"
+                    )
+                    .textContent =
+                        longitude.toFixed(6);
+
+
+                document
+                    .getElementById(
+                        "accuracy"
+                    )
+                    .textContent =
+                        Math.round(
+                            accuracy
+                        ) + " m";
+
+
+                // -----------------------------------------
+                // WEATHER
+                // -----------------------------------------
+
+                if (
+                    weather.temperature !== null &&
+                    weather.temperature !== undefined
+                ) {
+
+                    document
+                        .getElementById(
+                            "temperature"
+                        )
+                        .textContent =
+                            Number(
+                                weather.temperature
+                            ).toFixed(1)
+                            + " °C";
+                }
+
+
+                if (
+                    weather.humidity !== null &&
+                    weather.humidity !== undefined
+                ) {
+
+                    document
+                        .getElementById(
+                            "humidity"
+                        )
+                        .textContent =
+                            Math.round(
+                                weather.humidity
+                            ) + " %";
+                }
+
+
+                if (
+                    weather.rainfall !== null &&
+                    weather.rainfall !== undefined
+                ) {
+
+                    document
+                        .getElementById(
+                            "rainfall"
+                        )
+                        .textContent =
+                            Number(
+                                weather.rainfall
+                            ).toFixed(1)
+                            + " mm";
+                }
+
+
                 status.textContent =
-                    "Location is not supported by this browser.";
-                return;
+                    "✓ Farm location and weather loaded successfully.";
+
+                status.className =
+                    "location-status success";
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                status.textContent =
+                    error.message ||
+                    "Unable to save location.";
+
+                status.className =
+                    "location-status error";
+
+            } finally {
+
+                button.disabled = false;
+
+                button.textContent =
+                    "📍 Update My Location";
             }
 
-            button.disabled = true;
-            button.textContent = "Detecting location...";
-            status.textContent = "Requesting your location permission...";
+        },
 
-            navigator.geolocation.getCurrentPosition(
-                async function(position) {
-                    const latitude = position.coords.latitude;
-                    const longitude = position.coords.longitude;
-                    const accuracy = position.coords.accuracy;
 
-                    try {
-                        const response = await fetch("/api/location", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                latitude: latitude,
-                                longitude: longitude,
-                                accuracy: accuracy
-                            })
-                        });
+        function(error) {
 
-                        const result = await response.json();
+            let message =
+                "Unable to get your location.";
 
-                        if (!response.ok || result.status !== "ok") {
-                            throw new Error(
-                                result.message || "Unable to save location."
-                            );
-                        }
 
-                        document.getElementById("latitude").textContent =
-                            latitude.toFixed(6);
+            if (error.code === 1) {
 
-                        document.getElementById("longitude").textContent =
-                            longitude.toFixed(6);
+                message =
+                    "Location permission was denied. Allow location access in your browser and try again.";
 
-                        document.getElementById("accuracy").textContent =
-                            Math.round(accuracy) + " m";
+            } else if (error.code === 2) {
 
-                        status.textContent =
-                            "Farm location saved successfully.";
+                message =
+                    "Your location could not be determined. Check GPS/network access and try again.";
 
-                    } catch (error) {
-                        status.textContent =
-                            error.message || "Unable to save location.";
-                    } finally {
-                        button.disabled = false;
-                        button.textContent = "Use My Current Location";
-                    }
-                },
-                function(error) {
-                    let message = "Unable to get your location.";
+            } else if (error.code === 3) {
 
-                    if (error.code === 1) {
-                        message =
-                            "Location permission was denied. Allow location access and try again.";
-                    } else if (error.code === 2) {
-                        message =
-                            "Your location could not be determined. Check GPS/network access and try again.";
-                    } else if (error.code === 3) {
-                        message =
-                            "Location request timed out. Please try again.";
-                    }
+                message =
+                    "Location request timed out. Please try again.";
+            }
 
-                    status.textContent = message;
-                    button.disabled = false;
-                    button.textContent = "Use My Current Location";
-                },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 15000,
-                    maximumAge: 300000
-                }
-            );
+
+            status.textContent =
+                message;
+
+            status.className =
+                "location-status error";
+
+
+            button.disabled = false;
+
+            button.textContent =
+                "📍 Try Again";
+        },
+
+
+        {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 300000
         }
-    </script>
+    );
+}
+
+</script>
 
 </body>
+
 </html>
