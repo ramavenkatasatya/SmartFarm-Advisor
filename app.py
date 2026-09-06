@@ -1,6 +1,9 @@
 import os
 import sqlite3
+import json
 from datetime import datetime
+from urllib.request import Request, urlopen
+from urllib.parse import urlencode
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 
@@ -14,8 +17,7 @@ from services.advisory_engine import generate_advisory
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Vercel's deployed filesystem is read-only.
-# /tmp is writable during a serverless execution.
+# Vercel filesystem is read-only except /tmp.
 if os.environ.get("VERCEL"):
     DATABASE_PATH = "/tmp/smartfarm.db"
 else:
@@ -32,16 +34,36 @@ app = Flask(__name__)
 # =========================================================
 
 def get_db():
-    """
-    Create and return a SQLite database connection.
-    Row factory allows accessing columns by name.
-    """
     connection = sqlite3.connect(DATABASE_PATH)
     connection.row_factory = sqlite3.Row
     return connection
 
 
+def column_exists(connection, table_name, column_name):
+    columns = connection.execute(
+        f"PRAGMA table_info({table_name})"
+    ).fetchall()
+
+    return any(row["name"] == column_name for row in columns)
+
+
+def add_column_if_missing(connection, table_name, column_name, definition):
+
+    if not column_exists(
+        connection,
+        table_name,
+        column_name
+    ):
+        connection.execute(
+            f"""
+            ALTER TABLE {table_name}
+            ADD COLUMN {column_name} {definition}
+            """
+        )
+
+
 def init_db():
+
     connection = get_db()
 
     # -----------------------------------------------------
@@ -97,18 +119,241 @@ def init_db():
             current_crop TEXT,
             sowing_date TEXT,
 
+            latitude REAL,
+            longitude REAL,
+            location_accuracy REAL,
+            location_name TEXT,
+
+            weather_temperature REAL,
+            weather_humidity REAL,
+            weather_rainfall REAL,
+
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
+    # -----------------------------------------------------
+    # MIGRATION FOR EXISTING DATABASES
+    # -----------------------------------------------------
+
+    add_column_if_missing(
+        connection,
+        "farm_profile",
+        "latitude",
+        "REAL"
+    )
+
+    add_column_if_missing(
+        connection,
+        "farm_profile",
+        "longitude",
+        "REAL"
+    )
+
+    add_column_if_missing(
+        connection,
+        "farm_profile",
+        "location_accuracy",
+        "REAL"
+    )
+
+    add_column_if_missing(
+        connection,
+        "farm_profile",
+        "location_name",
+        "TEXT"
+    )
+
+    add_column_if_missing(
+        connection,
+        "farm_profile",
+        "weather_temperature",
+        "REAL"
+    )
+
+    add_column_if_missing(
+        connection,
+        "farm_profile",
+        "weather_humidity",
+        "REAL"
+    )
+
+    add_column_if_missing(
+        connection,
+        "farm_profile",
+        "weather_rainfall",
+        "REAL"
+    )
+
     connection.commit()
     connection.close()
 
 
-# Initialize database when application starts.
-# On Vercel this writes only to /tmp, not the read-only deployment filesystem.
+# Initialize database
 init_db()
+
+
+# =========================================================
+# EXTERNAL API HELPERS
+# =========================================================
+
+def reverse_geocode(latitude, longitude):
+
+    """
+    Convert latitude/longitude into a readable location
+    using OpenStreetMap Nominatim.
+    """
+
+    params = urlencode({
+        "lat": latitude,
+        "lon": longitude,
+        "format": "jsonv2",
+        "zoom": 10,
+        "addressdetails": 1
+    })
+
+    url = (
+        "https://nominatim.openstreetmap.org/reverse?"
+        + params
+    )
+
+    request = Request(
+        url,
+        headers={
+            "User-Agent":
+                "SmartFarm-Advisor/1.0 "
+                "(agricultural-advisory-project)"
+        }
+    )
+
+    with urlopen(request, timeout=10) as response:
+
+        data = json.loads(
+            response.read().decode("utf-8")
+        )
+
+    address = data.get("address", {})
+
+    location_name = (
+        address.get("village")
+        or address.get("town")
+        or address.get("city")
+        or address.get("municipality")
+        or address.get("county")
+        or "Unknown location"
+    )
+
+    district = (
+        address.get("state_district")
+        or address.get("district")
+        or address.get("county")
+        or ""
+    )
+
+    state = address.get("state", "")
+    country = address.get("country", "")
+
+    return {
+        "location_name": location_name,
+        "district": district,
+        "state": state,
+        "country": country,
+        "display_name": data.get(
+            "display_name",
+            location_name
+        )
+    }
+
+
+def get_weather(latitude, longitude):
+
+    """
+    Get current weather and recent/future precipitation
+    from Open-Meteo.
+    """
+
+    params = urlencode({
+        "latitude": latitude,
+        "longitude": longitude,
+
+        "current": (
+            "temperature_2m,"
+            "relative_humidity_2m,"
+            "precipitation"
+        ),
+
+        "daily": (
+            "precipitation_sum,"
+            "temperature_2m_max,"
+            "temperature_2m_min"
+        ),
+
+        "forecast_days": 7,
+
+        "timezone": "auto"
+    })
+
+    url = (
+        "https://api.open-meteo.com/v1/forecast?"
+        + params
+    )
+
+    request = Request(
+        url,
+        headers={
+            "User-Agent":
+                "SmartFarm-Advisor/1.0"
+        }
+    )
+
+    with urlopen(request, timeout=10) as response:
+
+        data = json.loads(
+            response.read().decode("utf-8")
+        )
+
+    current = data.get("current", {})
+    daily = data.get("daily", {})
+
+    temperature = current.get(
+        "temperature_2m"
+    )
+
+    humidity = current.get(
+        "relative_humidity_2m"
+    )
+
+    current_precipitation = current.get(
+        "precipitation",
+        0
+    )
+
+    daily_rainfall = daily.get(
+        "precipitation_sum",
+        []
+    )
+
+    # Seven-day rainfall total.
+    forecast_rainfall = sum(
+        float(value or 0)
+        for value in daily_rainfall
+    )
+
+    return {
+        "temperature": temperature,
+        "humidity": humidity,
+
+        # Use 7-day accumulated precipitation
+        # as the rainfall signal for the advisor.
+        "rainfall": forecast_rainfall,
+
+        "current_precipitation":
+            current_precipitation,
+
+        "daily_rainfall":
+            daily_rainfall
+    }
 
 
 # =========================================================
@@ -130,6 +375,297 @@ def advisor():
 
 
 # =========================================================
+# LOCATION PAGE
+# =========================================================
+
+@app.route("/location")
+def location():
+
+    connection = get_db()
+
+    profile = connection.execute("""
+        SELECT *
+        FROM farm_profile
+        WHERE id = 1
+    """).fetchone()
+
+    connection.close()
+
+    return render_template(
+        "location.html",
+        profile=profile
+    )
+
+
+# =========================================================
+# LOCATION API
+# =========================================================
+
+@app.route(
+    "/api/location",
+    methods=["POST"]
+)
+def save_location():
+
+    try:
+
+        data = request.get_json(
+            silent=True
+        ) or {}
+
+        latitude = float(
+            data.get("latitude")
+        )
+
+        longitude = float(
+            data.get("longitude")
+        )
+
+        accuracy_raw = data.get(
+            "accuracy"
+        )
+
+        accuracy = (
+            float(accuracy_raw)
+            if accuracy_raw is not None
+            else None
+        )
+
+    except (
+        TypeError,
+        ValueError
+    ):
+
+        return jsonify({
+            "status": "error",
+            "message":
+                "Invalid location coordinates."
+        }), 400
+
+    # -----------------------------------------------------
+    # VALIDATE COORDINATES
+    # -----------------------------------------------------
+
+    if not -90 <= latitude <= 90:
+
+        return jsonify({
+            "status": "error",
+            "message": "Invalid latitude."
+        }), 400
+
+    if not -180 <= longitude <= 180:
+
+        return jsonify({
+            "status": "error",
+            "message": "Invalid longitude."
+        }), 400
+
+    try:
+
+        # -------------------------------------------------
+        # REVERSE GEOCODING
+        # -------------------------------------------------
+
+        location_data = reverse_geocode(
+            latitude,
+            longitude
+        )
+
+    except Exception as error:
+
+        print(
+            "Reverse geocoding error:",
+            error
+        )
+
+        location_data = {
+            "location_name":
+                "Location detected",
+            "district": "",
+            "state": "",
+            "country": "",
+            "display_name":
+                "Location detected"
+        }
+
+    try:
+
+        # -------------------------------------------------
+        # WEATHER
+        # -------------------------------------------------
+
+        weather = get_weather(
+            latitude,
+            longitude
+        )
+
+    except Exception as error:
+
+        print(
+            "Weather API error:",
+            error
+        )
+
+        weather = {
+            "temperature": None,
+            "humidity": None,
+            "rainfall": None,
+            "current_precipitation": None,
+            "daily_rainfall": []
+        }
+
+    # -----------------------------------------------------
+    # SAVE TO FARM PROFILE
+    # -----------------------------------------------------
+
+    connection = get_db()
+
+    # Make sure profile row exists.
+    connection.execute("""
+        INSERT OR IGNORE INTO farm_profile (
+            id
+        )
+        VALUES (1)
+    """)
+
+    connection.execute("""
+        UPDATE farm_profile
+
+        SET
+            latitude = ?,
+            longitude = ?,
+            location_accuracy = ?,
+            location_name = ?,
+
+            district = CASE
+                WHEN ? != ''
+                THEN ?
+                ELSE district
+            END,
+
+            state = CASE
+                WHEN ? != ''
+                THEN ?
+                ELSE state
+            END,
+
+            weather_temperature = ?,
+            weather_humidity = ?,
+            weather_rainfall = ?,
+
+            updated_at = CURRENT_TIMESTAMP
+
+        WHERE id = 1
+    """, (
+
+        latitude,
+        longitude,
+        accuracy,
+
+        location_data["location_name"],
+
+        location_data["district"],
+        location_data["district"],
+
+        location_data["state"],
+        location_data["state"],
+
+        weather["temperature"],
+        weather["humidity"],
+        weather["rainfall"]
+    ))
+
+    connection.commit()
+    connection.close()
+
+    return jsonify({
+
+        "status": "ok",
+
+        "location": {
+            "latitude": latitude,
+            "longitude": longitude,
+            "accuracy": accuracy,
+
+            "name":
+                location_data["location_name"],
+
+            "district":
+                location_data["district"],
+
+            "state":
+                location_data["state"],
+
+            "country":
+                location_data["country"],
+
+            "display_name":
+                location_data["display_name"]
+        },
+
+        "weather": weather
+    })
+
+
+# =========================================================
+# WEATHER API
+# =========================================================
+
+@app.route("/api/weather")
+def weather_api():
+
+    try:
+
+        latitude = float(
+            request.args.get(
+                "latitude"
+            )
+        )
+
+        longitude = float(
+            request.args.get(
+                "longitude"
+            )
+        )
+
+    except (
+        TypeError,
+        ValueError
+    ):
+
+        return jsonify({
+            "status": "error",
+            "message":
+                "Latitude and longitude are required."
+        }), 400
+
+    try:
+
+        weather = get_weather(
+            latitude,
+            longitude
+        )
+
+        return jsonify({
+            "status": "ok",
+            "weather": weather
+        })
+
+    except Exception as error:
+
+        print(
+            "Weather error:",
+            error
+        )
+
+        return jsonify({
+            "status": "error",
+            "message":
+                "Unable to retrieve weather data."
+        }), 500
+
+
+# =========================================================
 # DASHBOARD
 # =========================================================
 
@@ -138,10 +674,6 @@ def dashboard():
 
     connection = get_db()
 
-    # -----------------------------------------------------
-    # LATEST ADVISORY
-    # -----------------------------------------------------
-
     latest = connection.execute("""
         SELECT *
         FROM advisory_history
@@ -149,18 +681,10 @@ def dashboard():
         LIMIT 1
     """).fetchone()
 
-    # -----------------------------------------------------
-    # TOTAL ADVISORIES
-    # -----------------------------------------------------
-
     total_advisories = connection.execute("""
         SELECT COUNT(*) AS count
         FROM advisory_history
     """).fetchone()["count"]
-
-    # -----------------------------------------------------
-    # FARM PROFILE
-    # -----------------------------------------------------
 
     farm_profile = connection.execute("""
         SELECT *
@@ -182,14 +706,13 @@ def dashboard():
 # MY FARM
 # =========================================================
 
-@app.route("/my-farm", methods=["GET", "POST"])
+@app.route(
+    "/my-farm",
+    methods=["GET", "POST"]
+)
 def my_farm():
 
     connection = get_db()
-
-    # -----------------------------------------------------
-    # SAVE FARM PROFILE
-    # -----------------------------------------------------
 
     if request.method == "POST":
 
@@ -248,17 +771,17 @@ def my_farm():
             ""
         ).strip()
 
-        # -------------------------------------------------
-        # VALIDATE FARM AREA
-        # -------------------------------------------------
-
         try:
+
             area = float(area_raw)
 
             if area <= 0:
                 raise ValueError
 
-        except (TypeError, ValueError):
+        except (
+            TypeError,
+            ValueError
+        ):
 
             profile = connection.execute("""
                 SELECT *
@@ -271,51 +794,39 @@ def my_farm():
             return render_template(
                 "my_farm.html",
                 profile=profile,
-                error="Please enter a valid farm area."
+                error=
+                    "Please enter a valid farm area."
             )
 
         # -------------------------------------------------
-        # SAVE / UPDATE FARM PROFILE
+        # Preserve GPS/weather data while updating profile
         # -------------------------------------------------
 
         connection.execute("""
-            INSERT INTO farm_profile (
-                id,
-                farmer_name,
-                farm_name,
-                area,
-                village,
-                district,
-                state,
-                soil_type,
-                irrigation_type,
-                water_availability,
-                current_crop,
-                sowing_date
+            INSERT OR IGNORE INTO farm_profile (
+                id
             )
-            VALUES (
-                1,
-                ?, ?,
-                ?,
-                ?, ?, ?,
-                ?,
-                ?, ?,
-                ?, ?
-            )
-            ON CONFLICT(id)
-            DO UPDATE SET
-                farmer_name = excluded.farmer_name,
-                farm_name = excluded.farm_name,
-                area = excluded.area,
-                village = excluded.village,
-                district = excluded.district,
-                state = excluded.state,
-                soil_type = excluded.soil_type,
-                irrigation_type = excluded.irrigation_type,
-                water_availability = excluded.water_availability,
-                current_crop = excluded.current_crop,
-                sowing_date = excluded.sowing_date,
+            VALUES (1)
+        """)
+
+        connection.execute("""
+            UPDATE farm_profile
+
+            SET
+                farmer_name = ?,
+                farm_name = ?,
+                area = ?,
+                village = ?,
+                district = ?,
+                state = ?,
+                soil_type = ?,
+                irrigation_type = ?,
+                water_availability = ?,
+                current_crop = ?,
+                sowing_date = ?,
                 updated_at = CURRENT_TIMESTAMP
+
+            WHERE id = 1
         """, (
             farmer_name,
             farm_name,
@@ -331,10 +842,6 @@ def my_farm():
         ))
 
         connection.commit()
-
-    # -----------------------------------------------------
-    # LOAD FARM PROFILE
-    # -----------------------------------------------------
 
     profile = connection.execute("""
         SELECT *
@@ -354,10 +861,14 @@ def my_farm():
 # GENERATE ADVISORY
 # =========================================================
 
-@app.route("/advisory", methods=["POST"])
+@app.route(
+    "/advisory",
+    methods=["POST"]
+)
 def advisory():
 
     try:
+
         nitrogen = float(
             request.form.get(
                 "nitrogen",
@@ -407,23 +918,26 @@ def advisory():
             )
         )
 
-    except (TypeError, ValueError):
+    except (
+        TypeError,
+        ValueError
+    ):
 
         return render_template(
             "advisor.html",
-            error="Please enter valid numerical values."
+            error=
+                "Please enter valid numerical values."
         )
 
-    # -----------------------------------------------------
-    # PREPARE MODEL INPUT
-    # -----------------------------------------------------
-
     input_data = {
+
         "N": nitrogen,
         "P": phosphorus,
         "K": potassium,
+
         "temperature": temperature,
         "humidity": humidity,
+
         "ph": ph,
         "rainfall": rainfall
     }
@@ -432,15 +946,18 @@ def advisory():
     # ML PREDICTION
     # -----------------------------------------------------
 
-    predictions = predict_crops(input_data)
+    predictions = predict_crops(
+        input_data
+    )
 
     if not predictions:
 
         return render_template(
             "advisor.html",
             error=(
-                "Unable to generate a crop prediction. "
-                "Please train the model first."
+                "Unable to generate a crop "
+                "prediction. Please train "
+                "the model first."
             )
         )
 
@@ -458,12 +975,16 @@ def advisory():
     # -----------------------------------------------------
 
     advisory_data = generate_advisory(
+
         crop=crop,
+
         nitrogen=nitrogen,
         phosphorus=phosphorus,
         potassium=potassium,
+
         temperature=temperature,
         humidity=humidity,
+
         ph=ph,
         rainfall=rainfall
     )
@@ -476,21 +997,27 @@ def advisory():
 
     connection.execute("""
         INSERT INTO advisory_history (
+
             created_at,
+
             nitrogen,
             phosphorus,
             potassium,
+
             temperature,
             humidity,
             ph,
             rainfall,
+
             recommended_crop,
             confidence,
+
             irrigation,
             fertilizer,
             soil_advice,
             general_advice
         )
+
         VALUES (
             ?, ?, ?, ?,
             ?, ?, ?, ?,
@@ -498,16 +1025,23 @@ def advisory():
             ?, ?, ?, ?
         )
     """, (
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+
+        datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        ),
+
         nitrogen,
         phosphorus,
         potassium,
+
         temperature,
         humidity,
         ph,
         rainfall,
+
         crop,
         confidence,
+
         advisory_data["irrigation"],
         advisory_data["fertilizer"],
         advisory_data["soil_advice"],
@@ -518,21 +1052,28 @@ def advisory():
     connection.close()
 
     # -----------------------------------------------------
-    # SHOW RESULT
+    # RESULT
     # -----------------------------------------------------
 
     return render_template(
+
         "result.html",
+
         predictions=predictions,
+
         crop=crop,
         confidence=confidence,
+
         nitrogen=nitrogen,
         phosphorus=phosphorus,
         potassium=potassium,
+
         temperature=temperature,
         humidity=humidity,
+
         ph=ph,
         rainfall=rainfall,
+
         advisory=advisory_data
     )
 
@@ -586,7 +1127,7 @@ def delete_history():
 
 
 # =========================================================
-# API HEALTH CHECK
+# HEALTH CHECK
 # =========================================================
 
 @app.route("/api/health")
