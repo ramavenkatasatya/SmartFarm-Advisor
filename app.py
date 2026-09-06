@@ -30,32 +30,24 @@ def get_db():
 
 def initialize_database():
 
-    connection = get_db()
-
-    connection.execute("""
-        CREATE TABLE IF NOT EXISTS advisory_history (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            created_at TEXT NOT NULL,
-
-            nitrogen REAL,
-            phosphorus REAL,
-            potassium REAL,
-
-            temperature REAL,
-            humidity REAL,
-            ph REAL,
-            rainfall REAL,
-
-            recommended_crop TEXT,
-            confidence REAL,
-
-            irrigation TEXT,
-            fertilizer TEXT,
-            soil_advice TEXT,
-            general_advice TEXT
+        connection.execute("""
+        CREATE TABLE IF NOT EXISTS farm_profile (
+            id INTEGER PRIMARY KEY,
+            farmer_name TEXT,
+            farm_name TEXT,
+            area REAL,
+            village TEXT,
+            district TEXT,
+            state TEXT,
+            soil_type TEXT,
+            irrigation_type TEXT,
+            water_availability TEXT,
+            current_crop TEXT,
+            sowing_date TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
-
     connection.commit()
     connection.close()
 
@@ -107,6 +99,144 @@ def dashboard():
         "dashboard.html",
         latest=latest,
         total_advisories=total_advisories
+    )
+    # ---------------------------------------------------------
+# MY FARM
+# ---------------------------------------------------------
+
+@app.route("/my-farm", methods=["GET", "POST"])
+def my_farm():
+
+    connection = get_db()
+
+    if request.method == "POST":
+
+        farmer_name = request.form.get("farmer_name", "").strip()
+        farm_name = request.form.get("farm_name", "").strip()
+
+        area_raw = request.form.get("area", "").strip()
+
+        village = request.form.get("village", "").strip()
+        district = request.form.get("district", "").strip()
+        state = request.form.get("state", "").strip()
+
+        soil_type = request.form.get("soil_type", "").strip()
+        irrigation_type = request.form.get("irrigation_type", "").strip()
+        water_availability = request.form.get(
+            "water_availability",
+            ""
+        ).strip()
+
+        current_crop = request.form.get(
+            "current_crop",
+            ""
+        ).strip()
+
+        sowing_date = request.form.get(
+            "sowing_date",
+            ""
+        ).strip()
+
+
+        # ---------------------------------------------
+        # VALIDATE AREA
+        # ---------------------------------------------
+
+        try:
+
+            area = float(area_raw)
+
+            if area <= 0:
+                raise ValueError
+
+        except (TypeError, ValueError):
+
+            profile = connection.execute("""
+                SELECT *
+                FROM farm_profile
+                WHERE id = 1
+            """).fetchone()
+
+            connection.close()
+
+            return render_template(
+                "my_farm.html",
+                profile=profile,
+                error="Please enter a valid farm area."
+            )
+
+
+        # ---------------------------------------------
+        # SAVE / UPDATE FARM PROFILE
+        # ---------------------------------------------
+
+        connection.execute("""
+            INSERT INTO farm_profile (
+                id,
+                farmer_name,
+                farm_name,
+                area,
+                village,
+                district,
+                state,
+                soil_type,
+                irrigation_type,
+                water_availability,
+                current_crop,
+                sowing_date
+            )
+
+            VALUES (
+                1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            )
+
+            ON CONFLICT(id)
+            DO UPDATE SET
+
+                farmer_name = excluded.farmer_name,
+                farm_name = excluded.farm_name,
+                area = excluded.area,
+                village = excluded.village,
+                district = excluded.district,
+                state = excluded.state,
+                soil_type = excluded.soil_type,
+                irrigation_type = excluded.irrigation_type,
+                water_availability = excluded.water_availability,
+                current_crop = excluded.current_crop,
+                sowing_date = excluded.sowing_date,
+                updated_at = CURRENT_TIMESTAMP
+        """, (
+            farmer_name,
+            farm_name,
+            area,
+            village,
+            district,
+            state,
+            soil_type,
+            irrigation_type,
+            water_availability,
+            current_crop,
+            sowing_date
+        ))
+
+        connection.commit()
+
+
+    # ---------------------------------------------
+    # LOAD FARM PROFILE
+    # ---------------------------------------------
+
+    profile = connection.execute("""
+        SELECT *
+        FROM farm_profile
+        WHERE id = 1
+    """).fetchone()
+
+    connection.close()
+
+    return render_template(
+        "my_farm.html",
+        profile=profile
     )
 # ---------------------------------------------------------
 # GENERATE ADVISORY
