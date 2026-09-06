@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="SmartFarm Advisor dashboard"
+    >
+
+    <title>SmartFarm Advisor | Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<header class="navbar">
+
+    <a
+        href="{{ url_for('home') }}"
+        class="brand"
+        aria-label="SmartFarm Advisor Home"
+    >
+
+        <img
+            src="{{ url_for('static', filename='images/logo.png') }}"
+            alt="SmartFarm Advisor"
+        >
+
+        <div>
+
+            <h2>SmartFarm</h2>
+
+            <span>Advisor</span>
+
+        </div>
+
+    </a>
+
+
+    <nav aria-label="Main navigation">
+
+        <a href="{{ url_for('home') }}">
+            Home
+        </a>
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="active"
+        >
+            Dashboard
+        </a>
+
+        <a href="{{ url_for('advisor') }}">
+            Crop Advisor
+        </a>
+
+        <a href="{{ url_for('history') }}">
+            History
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="dashboard-container">
+
+
+    <!-- ==================================================
+         DASHBOARD HEADER
+    =================================================== -->
+
+    <section class="dashboard-header">
+
+        <div>
+
+            <span class="section-label">
+                FARM COMMAND CENTER
+            </span>
+
+            <h1>
+                Your farm dashboard
+            </h1>
+
+            <p>
+                A single place to understand your farm,
+                review recommendations and see what needs
+                attention.
+            </p>
+
+        </div>
+
+
+        <a
+            href="{{ url_for('advisor') }}"
+            class="primary-button dashboard-action"
+        >
+            New Farm Analysis
+            <span aria-hidden="true">→</span>
+        </a>
+
+    </section>
+
+
+    <!-- ==================================================
+         STATUS CARDS
+    =================================================== -->
+
+    <section class="dashboard-status-grid">
+
+
+        <!-- LOCATION -->
+
+        <article class="dashboard-status-card">
+
+            <div class="dashboard-status-icon">
+                📍
+            </div>
+
+            <div>
+
+                <span class="dashboard-card-label">
+                    FARM LOCATION
+                </span>
+
+                <h3>
+                    Not set up
+                </h3>
+
+                <p>
+                    Location intelligence will be connected
+                    in the My Farm block.
+                </p>
+
+            </div>
+
+        </article>
+
+
+        <!-- WEATHER -->
+
+        <article class="dashboard-status-card">
+
+            <div class="dashboard-status-icon">
+                🌦️
+            </div>
+
+            <div>
+
+                <span class="dashboard-card-label">
+                    WEATHER
+                </span>
+
+                <h3>
+                    Not connected
+                </h3>
+
+                <p>
+                    Real weather intelligence will be added
+                    in the Weather block.
+                </p>
+
+            </div>
+
+        </article>
+
+
+        <!-- CROP -->
+
+        <article class="dashboard-status-card">
+
+            <div class="dashboard-status-icon">
+                🌱
+            </div>
+
+            <div>
+
+                <span class="dashboard-card-label">
+                    CURRENT CROP
+                </span>
+
+                {% if latest %}
+
+                    <h3>
+                        {{ latest["recommended_crop"] }}
+                    </h3>
+
+                    <p>
+                        Based on your latest crop analysis.
+                    </p>
+
+                {% else %}
+
+                    <h3>
+                        Not available
+                    </h3>
+
+                    <p>
+                        Run your first crop analysis.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+        </article>
+
+
+        <!-- HEALTH -->
+
+        <article class="dashboard-status-card">
+
+            <div class="dashboard-status-icon">
+                🩺
+            </div>
+
+            <div>
+
+                <span class="dashboard-card-label">
+                    CROP HEALTH
+                </span>
+
+                <h3>
+                    Not assessed
+                </h3>
+
+                <p>
+                    Crop health tracking will be added later.
+                </p>
+
+            </div>
+
+        </article>
+
+    </section>
+
+
+    <!-- ==================================================
+         MAIN DASHBOARD GRID
+    =================================================== -->
+
+    <section class="dashboard-main-grid">
+
+
+        <!-- ==================================================
+             LATEST ADVISORY
+        =================================================== -->
+
+        <article class="dashboard-panel dashboard-advisory-panel">
+
+            <div class="dashboard-panel-header">
+
+                <div>
+
+                    <span class="section-label">
+                        LATEST ANALYSIS
+                    </span>
+
+                    <h2>
+                        Crop recommendation
+                    </h2>
+
+                </div>
+
+                <a
+                    href="{{ url_for('advisor') }}"
+                    class="dashboard-text-link"
+                >
+                    Run new analysis →
+                </a>
+
+            </div>
+
+
+            {% if latest %}
+
+            <div class="recommendation-highlight">
+
+                <div>
+
+                    <span class="dashboard-card-label">
+                        RECOMMENDED CROP
+                    </span>
+
+                    <h3>
+                        {{ latest["recommended_crop"] }}
+                    </h3>
+
+                </div>
+
+
+                <div class="confidence-box">
+
+                    <span>
+                        MODEL SCORE
+                    </span>
+
+                    <strong>
+                        {{ "%.1f"|format(latest["confidence"]) }}%
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-date">
+
+                Analysis recorded on
+                {{ latest["created_at"] }}
+
+            </div>
+
+
+            {% else %}
+
+            <div class="dashboard-empty">
+
+                <div class="dashboard-empty-icon">
+                    🌱
+                </div>
+
+                <h3>
+                    Your dashboard is ready
+                </h3>
+
+                <p>
+                    Run your first crop analysis to start
+                    building your farm intelligence history.
+                </p>
+
+                <a
+                    href="{{ url_for('advisor') }}"
+                    class="primary-button"
+                >
+                    Start Crop Analysis →
+                </a>
+
+            </div>
+
+            {% endif %}
+
+        </article>
+
+
+        <!-- ==================================================
+             QUICK ACTIONS
+        =================================================== -->
+
+        <article class="dashboard-panel">
+
+            <div class="dashboard-panel-header">
+
+                <div>
+
+                    <span class="section-label">
+                        QUICK ACTIONS
+                    </span>
+
+                    <h2>
+                        What do you want to do?
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="quick-action-list">
+
+
+                <a
+                    href="{{ url_for('advisor') }}"
+                    class="quick-action"
+                >
+
+                    <span class="quick-action-icon">
+                        🌱
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Analyze my farm
+                        </strong>
+
+                        <span>
+                            Get a crop recommendation
+                        </span>
+
+                    </div>
+
+                    <span class="quick-action-arrow">
+                        →
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="{{ url_for('history') }}"
+                    class="quick-action"
+                >
+
+                    <span class="quick-action-icon">
+                        📊
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            View history
+                        </strong>
+
+                        <span>
+                            Review previous analyses
+                        </span>
+
+                    </div>
+
+                    <span class="quick-action-arrow">
+                        →
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="{{ url_for('home') }}#features"
+                    class="quick-action"
+                >
+
+                    <span class="quick-action-icon">
+                        🧭
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Explore SmartFarm
+                        </strong>
+
+                        <span>
+                            See upcoming farm tools
+                        </span>
+
+                    </div>
+
+                    <span class="quick-action-arrow">
+                        →
+                    </span>
+
+                </a>
+
+            </div>
+
+        </article>
+
+    </section>
+
+
+    <!-- ==================================================
+         FARM DATA
+    =================================================== -->
+
+    {% if latest %}
+
+    <section class="dashboard-panel dashboard-data-panel">
+
+        <div class="dashboard-panel-header">
+
+            <div>
+
+                <span class="section-label">
+                    LATEST FARM CONDITIONS
+                </span>
+
+                <h2>
+                    What was used for the recommendation?
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-metric-grid">
+
+
+            <div class="dashboard-metric">
+
+                <span>
+                    NITROGEN
+                </span>
+
+                <strong>
+                    {{ latest["nitrogen"] }}
+                </strong>
+
+                <small>
+                    Soil input
+                </small>
+
+            </div>
+
+
+            <div class="dashboard-metric">
+
+                <span>
+                    PHOSPHORUS
+                </span>
+
+                <strong>
+                    {{ latest["phosphorus"] }}
+                </strong>
+
+                <small>
+                    Soil input
+                </small>
+
+            </div>
+
+
+            <div class="dashboard-metric">
+
+                <span>
+                    POTASSIUM
+                </span>
+
+                <strong>
+                    {{ latest["potassium"] }}
+                </strong>
+
+                <small>
+                    Soil input
+                </small>
+
+            </div>
+
+
+            <div class="dashboard-metric">
+
+                <span>
+                    SOIL pH
+                </span>
+
+                <strong>
+                    {{ latest["ph"] }}
+                </strong>
+
+                <small>
+                    Soil input
+                </small>
+
+            </div>
+
+
+            <div class="dashboard-metric">
+
+                <span>
+                    TEMPERATURE
+                </span>
+
+                <strong>
+                    {{ latest["temperature"] }}°C
+                </strong>
+
+                <small>
+                    Analysis input
+                </small>
+
+            </div>
+
+
+            <div class="dashboard-metric">
+
+                <span>
+                    HUMIDITY
+                </span>
+
+                <strong>
+                    {{ latest["humidity"] }}%
+                </strong>
+
+                <small>
+                    Analysis input
+                </small>
+
+            </div>
+
+
+            <div class="dashboard-metric">
+
+                <span>
+                    RAINFALL
+                </span>
+
+                <strong>
+                    {{ latest["rainfall"] }} mm
+                </strong>
+
+                <small>
+                    Analysis input
+                </small>
+
+            </div>
+
+
+            <div class="dashboard-metric">
+
+                <span>
+                    ANALYSES
+                </span>
+
+                <strong>
+                    {{ total_advisories }}
+                </strong>
+
+                <small>
+                    Stored in SmartFarm
+                </small>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    {% endif %}
+
+
+    <!-- ==================================================
+         FARM INTELLIGENCE ROADMAP
+    =================================================== -->
+
+    <section class="dashboard-panel dashboard-roadmap">
+
+        <div class="dashboard-panel-header">
+
+            <div>
+
+                <span class="section-label">
+                    SMARTFARM EVOLUTION
+                </span>
+
+                <h2>
+                    Your farm intelligence is growing
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-roadmap-grid">
+
+
+            <div class="roadmap-item complete">
+
+                <span>
+                    01
+                </span>
+
+                <div>
+
+                    <strong>
+                        Crop Advisor
+                    </strong>
+
+                    <small>
+                        Available
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="roadmap-item">
+
+                <span>
+                    02
+                </span>
+
+                <div>
+
+                    <strong>
+                        My Farm
+                    </strong>
+
+                    <small>
+                        Next
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="roadmap-item">
+
+                <span>
+                    03
+                </span>
+
+                <div>
+
+                    <strong>
+                        Weather
+                    </strong>
+
+                    <small>
+                        Coming soon
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="roadmap-item">
+
+                <span>
+                    04
+                </span>
+
+                <div>
+
+                    <strong>
+                        Soil Intelligence
+                    </strong>
+
+                    <small>
+                        Coming soon
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="roadmap-item">
+
+                <span>
+                    05
+                </span>
+
+                <div>
+
+                    <strong>
+                        Irrigation
+                    </strong>
+
+                    <small>
+                        Coming soon
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="roadmap-item">
+
+                <span>
+                    06
+                </span>
+
+                <div>
+
+                    <strong>
+                        Crop Health
+                    </strong>
+
+                    <small>
+                        Coming soon
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+<footer>
+
+    <p>
+        SmartFarm Advisor · AI-assisted agricultural decision support
+    </p>
+
+</footer>
+
+
+</body>
+
+</html>
