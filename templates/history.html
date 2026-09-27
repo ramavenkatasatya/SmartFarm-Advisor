@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>History | SmartFarm Advisor</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+
+<header class="navbar">
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            🌱
+        </div>
+
+        <div>
+            <h2>SmartFarm</h2>
+            <span>Advisor</span>
+        </div>
+
+    </div>
+
+
+    <nav>
+
+        <a href="{{ url_for('home') }}">
+        Home
+    </a>
+
+    <a href="{{ url_for('dashboard') }}">
+        Dashboard
+    </a>
+
+    <a href="{{ url_for('advisor') }}">
+        Crop Advisor
+    </a>
+
+    <a href="{{ url_for('about') }}">
+        About
+    </a>
+
+    <a
+        href="{{ url_for('history') }}"
+        class="active"
+    >
+        History
+    </a>
+
+        <div class="translator-widget" style="margin-left: 15px; position: relative; display: inline-flex; align-items: center;">
+            <select onchange="translatePage(this.value)" style="padding: 6px 28px 6px 12px; border-radius: 20px; border: 1px solid #c3dfd0; background: #eaf5ee; color: #1f6b45; font-size: 0.9rem; font-weight: 500; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none;">
+                <option value="en">🌐 English</option>
+                <option value="te">తెలుగు (Telugu)</option>
+                <option value="hi">हिंदी (Hindi)</option>
+                <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                <option value="ta">தமிழ் (Tamil)</option>
+                <option value="ml">മലയാളം (Malayalam)</option>
+            </select>
+            <div style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #1f6b45; font-size: 0.7rem;">▼</div>
+        </div>
+    </nav>
+
+</header>
+
+
+<main class="container">
+
+
+    <section class="result-hero">
+
+        <span class="badge">
+            FARM RECORDS
+        </span>
+
+        <h1>
+            Advisory history
+        </h1>
+
+        <p>
+            Review previous crop recommendations and farm conditions.
+        </p>
+
+    </section>
+
+
+    {% if records %}
+
+
+    <div class="history-header">
+
+        <h2>
+            Recent analyses
+        </h2>
+
+
+        <form
+            method="POST"
+            action="{{ url_for('delete_history') }}"
+            onsubmit="return confirm('Delete all advisory history?')"
+        >
+
+            <button
+                type="submit"
+                class="danger-button"
+            >
+                Clear History
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <div class="history-list">
+
+        {% for record in records %}
+
+        <div class="history-card">
+
+            <div class="history-date">
+
+                <span>
+                    {{ record.created_at }}
+                </span>
+
+            </div>
+
+
+            <div class="history-main">
+
+                <div>
+
+                    <span class="section-label">
+                        RECOMMENDED CROP
+                    </span>
+
+                    <h3>
+                        {{ record.recommended_crop }}
+                    </h3>
+
+                </div>
+
+
+                <div class="history-confidence">
+
+                    <strong>
+                        {{ record.confidence }}%
+                    </strong>
+
+                    <span>
+                        confidence
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="history-metrics">
+
+                <span>
+                    N: {{ record.nitrogen }}
+                </span>
+
+                <span>
+                    P: {{ record.phosphorus }}
+                </span>
+
+                <span>
+                    K: {{ record.potassium }}
+                </span>
+
+                <span>
+                    pH: {{ record.ph }}
+                </span>
+
+                <span>
+                    Rainfall: {{ record.rainfall }} mm
+                </span>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% else %}
+
+
+    <div class="empty-state">
+
+        <div>
+            🌱
+        </div>
+
+        <h2>
+            No advisory history yet
+        </h2>
+
+        <p>
+            Generate your first farm advisory to see it here.
+        </p>
+
+        <a
+            href="{{ url_for('home') }}"
+            class="primary-button"
+        >
+            Generate Advisory →
+        </a>
+
+    </div>
+
+
+    {% endif %}
+
+
+</main>
+
+
+<footer>
+
+    <p>
+        SmartFarm Advisor · AI-assisted agricultural decision support
+    </p>
+
+</footer>
+
+
+
+<div id="google_translate_element" style="display:none;"></div>
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: 'en,te,hi,kn,ta,ml', autoDisplay: false}, 'google_translate_element');
+}
+function translatePage(languageCode) {
+    var selectField = document.querySelector("#google_translate_element select");
+    if (!selectField) return;
+    selectField.value = languageCode;
+    selectField.dispatchEvent(new Event('change'));
+}
+</script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<style>
+/* Hide the Google Translate toolbar and tooltips completely */
+.goog-te-banner-frame.skiptranslate, .goog-te-banner-frame, .VIpgJd-ZVi9od-ORHb-OEVmcd, #goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
+body { top: 0px !important; padding-top: 0px !important; }
+.goog-text-highlight { background-color: transparent !important; border: none !important; box-shadow: none !important; }
+iframe.goog-te-banner-frame { display: none !important; }
+</style>
+</body>
+
+</html>
