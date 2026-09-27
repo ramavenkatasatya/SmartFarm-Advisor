@@ -6,11 +6,422 @@
     <title>About | SmartFarm Advisor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
+        .about-page-wrapper {
+            max-width: 1100px;
+            margin: 60px auto;
+            padding: 0 20px;
+            font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+        }
+
+        .about-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .about-header h1 {
+            color: #034f36;
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            font-family: var(--font-serif);
+            font-weight: 700;
+        }
+
+        .about-header p {
+            color: #4b6b5a;
+            font-size: 1.25rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            color: #034f36;
+            font-size: 2rem;
+            margin: 60px 0 30px;
+            font-family: var(--font-serif);
+            font-weight: 700;
+        }
+
+        /* Card Styles */
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 40px;
+            border: 1px solid #d1fae5;
+            box-shadow: 0 4px 20px rgba(52, 211, 153, 0.15);
+            margin-bottom: 30px;
+        }
+
+        .card-icon {
+            color: #059669;
+            margin-bottom: 20px;
+        }
+        
+        .card-icon svg {
+            width: 36px;
+            height: 36px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Specific Cards */
+        .mission-card {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .mission-card .mission-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .mission-card h2 {
+            color: #034f36;
+            font-size: 2rem;
+            margin: 0;
+            font-family: var(--font-serif);
+        }
+
+        .mission-card p {
+            color: #4b6b5a;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        /* Grid Layouts */
+        .grid-2x2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .grid-3x1 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* Small Card Styling */
+        .small-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #d1fae5;
+            box-shadow: 0 4px 20px rgba(52, 211, 153, 0.1);
+        }
+
+        .small-card h3 {
+            color: #034f36;
+            font-size: 1.3rem;
+            margin: 15px 0;
+        }
+
+        .small-card p {
+            color: #4b6b5a;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        /* Technology Icons Override */
+        .tech-card {
+            text-align: center;
+        }
+        .tech-card .card-icon {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        /* Helps Section (Vertical Card with sub-items) */
+        .helps-card .helps-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .helps-card h2 {
+            color: #034f36;
+            font-size: 1.8rem;
+            margin: 0;
+            font-family: var(--font-serif);
+        }
+
+        .help-item {
+            margin-bottom: 25px;
+        }
+
+        .help-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .help-item h3 {
+            color: #034f36;
+            font-size: 1.2rem;
+            margin: 0 0 10px 0;
+        }
+
+        .help-item p {
+            color: #4b6b5a;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Values Section (Horizontal Card with Grid) */
+        .values-card {
+            text-align: center;
+        }
+
+        .values-card h2 {
+            color: #034f36;
+            font-size: 1.8rem;
+            margin-bottom: 40px;
+            font-family: var(--font-serif);
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            text-align: left;
+        }
+
+        .value-item h3 {
+            color: #059669;
+            font-size: 1.2rem;
+            margin: 0 0 10px 0;
+        }
+
+        .value-item p {
+            color: #4b6b5a;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2x2, .grid-3x1, .values-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="{{ url_for('home') }}" class="brand" aria-label="SmartFarm Advisor Home">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="SmartFarm Advisor logo">
+        <div>
+            <h2>SmartFarm</h2>
+            <span>Advisor</span>
+        </div>
+    </a>
+    <nav aria-label="Main navigation">
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('advisor') }}">Crop Advisor</a>
+        <a href="{{ url_for('about') }}" class="active">About</a>
+        <a href="{{ url_for('faq') }}">FAQs</a>
+        <a href="{{ url_for('history') }}">History</a>
+        <div class="translator-widget" style="margin-left: 15px; position: relative; display: inline-flex; align-items: center;">
+            <select onchange="translatePage(this.value)" style="padding: 6px 28px 6px 12px; border-radius: 20px; border: 1px solid #c3dfd0; background: #eaf5ee; color: #1f6b45; font-size: 0.9rem; font-weight: 500; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none;">
+                <option value="en">🌐 English</option>
+                <option value="te">తెలుగు (Telugu)</option>
+                <option value="hi">हिंदी (Hindi)</option>
+                <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                <option value="ta">தமிழ் (Tamil)</option>
+                <option value="ml">മലയാളം (Malayalam)</option>
+            </select>
+            <div style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #1f6b45; font-size: 0.7rem;">▼</div>
+        </div>
+    </nav>
+</header>
+
+<main class="about-page-wrapper">
+    
+    <!-- HEADER -->
+    <div class="about-header">
+        <h1>About SmartFarm Advisor</h1>
+        <p>Empowering farmers with data-driven insights for sustainable and profitable agriculture</p>
+    </div>
+
+    <!-- OUR MISSION -->
+    <div class="card mission-card">
+        <div class="mission-header">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <circle cx="12" cy="12" r="6"></circle>
+                    <circle cx="12" cy="12" r="2"></circle>
+                </svg>
+            </div>
+            <h2>Our Mission</h2>
+        </div>
+        <p>SmartFarm Advisor is dedicated to revolutionizing agriculture through technology. We believe that every farmer deserves access to the same sophisticated tools and insights that large agricultural corporations use. Our mission is to democratize agricultural intelligence and make precision farming accessible to everyone.</p>
+        <p>By combining advanced data analytics, machine learning, and comprehensive agricultural databases, we provide actionable recommendations that help farmers maximize yields, minimize costs, and make environmentally sustainable choices.</p>
+    </div>
+
+    <!-- WHAT WE DO -->
+    <h2 class="section-title">What SmartFarm Advisor Does</h2>
+    <div class="grid-2x2">
+        <!-- Card 1 -->
+        <div class="small-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            </div>
+            <h3>Smart Location-Based Analysis</h3>
+            <p>Choose between Normal Mode with automatic real-time weather detection or Advanced Mode for precise manual inputs. Search or detect your location, and our system automatically fetches current temperature, humidity, and annual rainfall data to recommend the most suitable crops with EcoFit scores showing environmental compatibility.</p>
+        </div>
+        <!-- Card 2 -->
+        <div class="small-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            </div>
+            <h3>Accurate Yield & Financial Forecasting</h3>
+            <p>Receive precise yield predictions per hectare based on your farm size and custom overhead costs. Our algorithms analyze crop-specific NPK requirements, optimal temperature and humidity ranges, rainfall patterns, and soil pH levels to provide comprehensive financial projections including total yield, revenue, costs, and profit margins.</p>
+        </div>
+        <!-- Card 3 -->
+        <div class="small-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"></rect><rect x="10" y="8" width="4" height="13"></rect><rect x="2" y="13" width="4" height="8"></rect></svg>
+            </div>
+            <h3>Dynamic Cost & Profitability Analysis</h3>
+            <p>Get detailed cost breakdowns including fertilizer requirements, pesticide applications, irrigation needs, labor charges, and operational expenses. Input your farm size and custom overhead costs to see real-time updates to total investment, expected revenue, and profit projections. Export comprehensive PDF reports with visual analytics and detailed crop information.</p>
+        </div>
+        <!-- Card 4 -->
+        <div class="small-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+            <h3>Profit Calculation</h3>
+            <p>Calculate projected profits based on current market prices, estimated yields, and total costs. Compare multiple crops side-by-side to identify the most profitable options for your specific circumstances and investment capacity.</p>
+        </div>
+    </div>
+
+    <!-- HOW IT HELPS -->
+    <div class="card helps-card">
+        <div class="helps-header">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 4 13V4h9a7 7 0 0 1 7 7v9h-9Z"></path><path d="M11 20V13"></path></svg>
+            </div>
+            <h2>How SmartFarm Advisor Helps</h2>
+        </div>
+
+        <div class="help-item">
+            <h3>Make Data-Driven Decisions</h3>
+            <p>Stop relying on guesswork or outdated practices. Our platform provides evidence-based recommendations backed by comprehensive agricultural data, weather patterns, and market intelligence. Make informed choices that maximize your return on investment.</p>
+        </div>
+
+        <div class="help-item">
+            <h3>Compare Profitability</h3>
+            <p>View multiple crop options simultaneously with detailed financial projections. Compare potential profits, required investments, and growth cycles to choose crops that align with your financial goals and risk tolerance.</p>
+        </div>
+
+        <div class="help-item">
+            <h3>Optimize Input Costs</h3>
+            <p>Experiment with different input scenarios to find the optimal balance between costs and yields. Adjust fertilizer quantities, labor allocation, and other expenses to see real-time impact on your profit margins. Identify cost-saving opportunities without sacrificing yield.</p>
+        </div>
+
+        <div class="help-item">
+            <h3>Environmental Matching</h3>
+            <p>Match crops to your land's specific environmental conditions. Our system compares your soil's NPK profile, pH levels, temperature ranges, humidity, and rainfall against ideal conditions for each crop. Grow what thrives naturally, reducing the need for expensive interventions.</p>
+        </div>
+
+        <div class="help-item">
+            <h3>Risk Mitigation</h3>
+            <p>Understand potential challenges before planting. Our platform highlights environmental mismatches, high-cost crops, and market volatility risks. Make contingency plans and choose crops that are resilient to your region's specific challenges.</p>
+        </div>
+    </div>
+
+    <!-- OUR TECHNOLOGY -->
+    <h2 class="section-title">Our Technology</h2>
+    <div class="grid-3x1">
+        <!-- Tech Card 1 -->
+        <div class="small-card tech-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+            </div>
+            <h3>Comprehensive Data</h3>
+            <p>Built on extensive databases covering NPK profiles for 27+ crops, historical market prices, weather patterns across India, and soil characteristics by district.</p>
+        </div>
+        <!-- Tech Card 2 -->
+        <div class="small-card tech-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+            <h3>Real-Time Analysis</h3>
+            <p>Instant calculations and recommendations powered by advanced algorithms that process multiple data points including environmental conditions, market trends, and crop requirements.</p>
+        </div>
+        <!-- Tech Card 3 -->
+        <div class="small-card tech-card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+            </div>
+            <h3>Visual Insights</h3>
+            <p>Interactive charts and graphs that make complex data easy to understand. Visualize profit comparisons, yield predictions, and cost breakdowns at a glance.</p>
+        </div>
+    </div>
+
+    <!-- OUR VALUES -->
+    <div class="card values-card">
+        <h2>Our Values</h2>
+        <div class="values-grid">
+            <div class="value-item">
+                <h3>Accessibility</h3>
+                <p>We believe powerful agricultural tools should be available to everyone, regardless of farm size or technical expertise. Our platform is designed to be intuitive and user-friendly.</p>
+            </div>
+            <div class="value-item">
+                <h3>Accuracy</h3>
+                <p>We're committed to providing reliable, data-backed recommendations. Our algorithms are continuously refined based on real-world feedback and the latest agricultural research.</p>
+            </div>
+            <div class="value-item">
+                <h3>Sustainability</h3>
+                <p>We promote farming practices that are economically viable and environmentally responsible. Our recommendations consider long-term soil health and ecological impact.</p>
+            </div>
+            <div class="value-item">
+                <h3>Innovation</h3>
+                <p>Agriculture is evolving, and so are we. We continuously integrate new data sources, technologies, and methodologies to provide cutting-edge insights.</p>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    <p>
+        SmartFarm Advisor · AI-assisted agricultural decision support
+    </p>
+</footer>
+
+<div id="google_translate_element" style="display:none;"></div>
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: 'en,te,hi,kn,ta,ml', autoDisplay: false}, 'google_translate_element');
+}
+function translatePage(languageCode) {
+    var selectField = document.querySelector("#google_translate_element select");
+    if (!selectField) return;
+    selectField.value = languageCode;
+    selectField.dispatchEvent(new Event('change'));
+}
+</script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<style>
 /* Hide the Google Translate toolbar and tooltips completely */
 .goog-te-banner-frame.skiptranslate, .goog-te-banner-frame, .VIpgJd-ZVi9od-ORHb-OEVmcd, #goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
 body { top: 0px !important; padding-top: 0px !important; }
 .goog-text-highlight { background-color: transparent !important; border: none !important; box-shadow: none !important; }
 iframe.goog-te-banner-frame { display: none !important; }
 </style>
+
 </body>
 </html>

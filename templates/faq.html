@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ | SmartFarm Advisor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .faq-container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 20px;
+            font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+        }
+        .faq-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .faq-header h1 {
+            color: #034f36;
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            font-family: var(--font-serif);
+            font-weight: 700;
+        }
+        .faq-header p {
+            color: #4b6b5a;
+            font-size: 1.25rem;
+        }
+        
+        /* Category Styles */
+        .faq-category {
+            margin-bottom: 40px;
+        }
+        .faq-category h2 {
+            color: #034f36;
+            font-size: 1.8rem;
+            font-family: var(--font-serif);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #d1fae5;
+        }
+
+        .faq-section {
+            background-color: #ffffff;
+            padding: 20px 40px;
+            border-radius: 20px;
+            border: 1px solid #d1fae5;
+            box-shadow: 0 4px 20px rgba(52, 211, 153, 0.1);
+        }
+        
+        /* Accordion Styles */
+        .faq-item {
+            border-bottom: 1px solid #eaf5ee;
+            padding: 10px 0;
+            overflow: hidden;
+        }
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+        .faq-question {
+            font-weight: 600;
+            color: #034f36;
+            font-size: 1.15rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            transition: color 0.3s;
+            user-select: none;
+        }
+        .faq-question:hover {
+            color: #059669;
+        }
+        
+        .faq-question .icon {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: #059669;
+            transition: transform 0.3s ease;
+            line-height: 1;
+        }
+        
+        .faq-item.active .faq-question .icon {
+            transform: rotate(45deg);
+        }
+        
+        .faq-item.active .faq-question {
+            color: #059669;
+        }
+        
+        .faq-answer {
+            color: #4b6b5a;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+            padding: 0 20px 0 0;
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            opacity: 1;
+            padding: 5px 20px 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="{{ url_for('home') }}" class="brand" aria-label="SmartFarm Advisor Home">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="SmartFarm Advisor logo">
+        <div>
+            <h2>SmartFarm</h2>
+            <span>Advisor</span>
+        </div>
+    </a>
+    <nav aria-label="Main navigation">
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('advisor') }}">Crop Advisor</a>
+        <a href="{{ url_for('about') }}">About</a>
+        <a href="{{ url_for('faq') }}" class="active">FAQs</a>
+        <a href="{{ url_for('history') }}">History</a>
+        <div class="translator-widget" style="margin-left: 15px; position: relative; display: inline-flex; align-items: center;">
+            <select onchange="translatePage(this.value)" style="padding: 6px 28px 6px 12px; border-radius: 20px; border: 1px solid #c3dfd0; background: #eaf5ee; color: #1f6b45; font-size: 0.9rem; font-weight: 500; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none;">
+                <option value="en">🌐 English</option>
+                <option value="te">తెలుగు (Telugu)</option>
+                <option value="hi">हिंदी (Hindi)</option>
+                <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                <option value="ta">தமிழ் (Tamil)</option>
+                <option value="ml">മലയാളം (Malayalam)</option>
+            </select>
+            <div style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #1f6b45; font-size: 0.7rem;">▼</div>
+        </div>
+    </nav>
+</header>
+
+<main class="faq-container">
+    <div class="faq-header">
+        <h1>Frequently Asked Questions</h1>
+        <p>Find answers to common questions about using SmartFarm Advisor</p>
+    </div>
+
+    <!-- General Information Category -->
+    <div class="faq-category">
+        <h2>General Information</h2>
+        <div class="faq-section">
+            <div class="faq-item">
+                <div class="faq-question">What is SmartFarm Advisor? <span class="icon">+</span></div>
+                <div class="faq-answer">SmartFarm Advisor is an AI-powered platform designed to help farmers make data-driven decisions about crop selection, soil management, and weather planning.</div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">Is the service free to use? <span class="icon">+</span></div>
+                <div class="faq-answer">Yes, SmartFarm Advisor is currently a completely free tool designed to support the agricultural community and promote sustainable, data-driven farming practices.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Is there a mobile app available for SmartFarm Advisor? <span class="icon">+</span></div>
+                <div class="faq-answer">SmartFarm Advisor is built as a fully responsive web application, which means it works perfectly on your mobile phone's web browser without needing to download a separate app from an app store.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What languages are supported? <span class="icon">+</span></div>
+                <div class="faq-answer">Currently, the platform supports English, Telugu, Hindi, Kannada, Tamil, and Malayalam through our integrated translation tool available in the navigation bar.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features & Functionality Category -->
+    <div class="faq-category">
+        <h2>Features & Functionality</h2>
+        <div class="faq-section">
+            <div class="faq-item">
+                <div class="faq-question">How does the Crop Advisor work? <span class="icon">+</span></div>
+                <div class="faq-answer">It uses a machine learning model to analyze your soil parameters (Nitrogen, Phosphorus, Potassium, pH) along with local weather data (temperature, humidity, rainfall) to recommend the most suitable crop for your farm.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How does the Profitability Analysis work? <span class="icon">+</span></div>
+                <div class="faq-answer">Our financial tools take your farm's size and custom overhead costs into account. We compare them against average yields and current market prices to estimate potential revenue, net profit, and overall cost breakdowns for each recommended crop.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What does the "EcoFit" score mean? <span class="icon">+</span></div>
+                <div class="faq-answer">The EcoFit score is an indicator of how well a particular crop naturally aligns with your local environment. A higher score means the crop is highly suited for your soil and weather, requiring fewer external interventions like excessive watering or fertilizers.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can it help with irrigation planning? <span class="icon">+</span></div>
+                <div class="faq-answer">While our primary focus is currently on crop selection, profitability, and weather matching, we are actively developing dedicated Irrigation and Soil Intelligence tools that will be released very soon.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I track my past crop recommendations? <span class="icon">+</span></div>
+                <div class="faq-answer">Yes! Simply head to the "History" tab in the navigation menu. There, you can see all your previous soil parameters, weather inputs, and the crops that were recommended to you at that time.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data & Privacy Category -->
+    <div class="faq-category">
+        <h2>Data & Privacy</h2>
+        <div class="faq-section">
+            <div class="faq-item">
+                <div class="faq-question">Is my farm's data secure? <span class="icon">+</span></div>
+                <div class="faq-answer">Yes, all farm profiles and historical advisories are securely stored in a local database attached to your account, ensuring your farm data remains private and easily accessible whenever you need it.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Do I need internet access to use this? <span class="icon">+</span></div>
+                <div class="faq-answer">An internet connection is required to fetch real-time weather data and location information, but your core historical records and saved farm profiles can be viewed anytime.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How accurate is the weather data? <span class="icon">+</span></div>
+                <div class="faq-answer">We integrate with reliable third-party weather APIs (such as Open-Meteo) to provide highly accurate, hyper-local 7-day forecasts based precisely on your farm's GPS coordinates.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account & Farm Management Category -->
+    <div class="faq-category">
+        <h2>Farm Management</h2>
+        <div class="faq-section">
+            <div class="faq-item">
+                <div class="faq-question">Can I manage multiple farms? <span class="icon">+</span></div>
+                <div class="faq-answer">Absolutely. The "My Farm" feature allows you to create and manage multiple profiles, each with its own unique soil composition, area size, and location parameters.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How do I update my farm's location? <span class="icon">+</span></div>
+                <div class="faq-answer">You can update your location by going to the "My Farm" tab, editing your farm profile, and clicking the "Detect Location" button, or by manually adjusting your latitude and longitude.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How do I get my soil N-P-K and pH values? <span class="icon">+</span></div>
+                <div class="faq-answer">You can obtain these values by sending a sample of your farm's soil to a local agricultural testing laboratory, or by using a reliable at-home digital soil testing kit.</div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    <p>
+        SmartFarm Advisor · AI-assisted agricultural decision support
+    </p>
+</footer>
+
+<div id="google_translate_element" style="display:none;"></div>
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: 'en,te,hi,kn,ta,ml', autoDisplay: false}, 'google_translate_element');
+}
+function translatePage(languageCode) {
+    var selectField = document.querySelector("#google_translate_element select");
+    if (!selectField) return;
+    selectField.value = languageCode;
+    selectField.dispatchEvent(new Event('change'));
+}
+</script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+    // Accordion functionality
+    document.addEventListener("DOMContentLoaded", () => {
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        
+        faqQuestions.forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentNode;
+                
+                // Close other open accordions
+                document.querySelectorAll('.faq-item').forEach(otherItem => {
+                    if (otherItem !== item && otherItem.classList.contains('active')) {
+                        otherItem.classList.remove('active');
+                    }
+                });
+                
+                // Toggle current accordion
+                item.classList.toggle('active');
+            });
+        });
+    });
+</script>
+
+<style>
+/* Hide the Google Translate toolbar and tooltips completely */
+.goog-te-banner-frame.skiptranslate, .goog-te-banner-frame, .VIpgJd-ZVi9od-ORHb-OEVmcd, #goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
+body { top: 0px !important; padding-top: 0px !important; }
+.goog-text-highlight { background-color: transparent !important; border: none !important; box-shadow: none !important; }
+iframe.goog-te-banner-frame { display: none !important; }
+</style>
+
+</body>
+</html>
